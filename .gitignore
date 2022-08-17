@@ -127,3 +127,13 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Visual Studio Code
+.vscode/
+
+# Custom
+# app.py
+# app.*.py
+# tst.py
+# tst.*.py
+# .ignore/
