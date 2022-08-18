@@ -5,7 +5,7 @@ from .sentinels import Missing, MissingType
 T = TypeVar("T")
 
 
-class Field(Generic[T]):
+class Param(Generic[T]):
     _default: Union[T, MissingType]
     _default_factory: Union[Callable[[], T], MissingType]
 

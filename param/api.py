@@ -3,14 +3,14 @@ from typing import Any, Callable, Dict, List, Tuple, TypeVar
 from typing_extensions import ParamSpec
 import functools
 from inspect import BoundArguments, Signature, Parameter
-from .field import Field
+from .param import Param
 
 PS = ParamSpec("PS")
 RT = TypeVar("RT")
 
 def enrich(parameter: Parameter, argument: Any) -> Any:
-    if not isinstance(argument, Field):
-        argument
+    if not isinstance(argument, Param):
+        return argument
 
     if not argument.has_default():
         raise ValueError(f"missing argument: {parameter.name}")
@@ -43,7 +43,7 @@ def get_arguments(func: Callable[..., Any], args: Tuple[Any], kwargs: Dict[str, 
     return (new_args, new_kwargs)
 
 
-def fielded(func: Callable[PS, RT], /) -> Callable[PS, RT]:
+def params(func: Callable[PS, RT], /) -> Callable[PS, RT]:
     @functools.wraps(func)
     def wrapper(*args: PS.args, **kwargs: PS.kwargs) -> RT:
         new_args: Tuple[Any]

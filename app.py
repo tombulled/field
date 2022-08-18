@@ -1,4 +1,4 @@
-from field import Field, fielded
+from field import Field, params
 import inspect
 
 
@@ -6,7 +6,7 @@ def process_1(data: dict = {}):
     print(id(data))
 
 
-@fielded
+@params
 def process_2(data: dict = Field(default_factory=dict)):
     print(id(data))
 
