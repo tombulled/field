@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "param"
 version = "0.1.0"
-description = ""
+description = "Enhanced function parameters"
 authors = ["Tom Bulled <26026015+tombulled@users.noreply.github.com>"]
 license = "MIT"
 

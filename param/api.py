@@ -2,13 +2,17 @@ import inspect
 from typing import Any, Callable, Dict, List, Tuple, TypeVar
 from typing_extensions import ParamSpec
 import functools
-from inspect import BoundArguments, Signature, Parameter
+from inspect import BoundArguments, Signature
 from .param import Param
+from .models import Parameter
+from .enums import ParameterKind
+from .sentinels import Missing
 
 PS = ParamSpec("PS")
 RT = TypeVar("RT")
 
-def enrich(parameter: Parameter, argument: Any) -> Any:
+
+def enrich(parameter: inspect.Parameter, argument: Any) -> Any:
     if not isinstance(argument, Param):
         return argument
 
@@ -17,7 +21,10 @@ def enrich(parameter: Parameter, argument: Any) -> Any:
 
     return argument.default
 
-def get_arguments(func: Callable[..., Any], args: Tuple[Any], kwargs: Dict[str, Any]) -> Tuple[Tuple[Any], Dict[str, Any]]:
+
+def get_arguments(
+    func: Callable[..., Any], args: Tuple[Any], kwargs: Dict[str, Any]
+) -> Tuple[Tuple[Any, ...], Dict[str, Any]]:
     signature: Signature = inspect.signature(func)
 
     bound_arguments: BoundArguments = signature.bind(*args, **kwargs)
@@ -30,23 +37,42 @@ def get_arguments(func: Callable[..., Any], args: Tuple[Any], kwargs: Dict[str, 
     index: int
     arg: Any
     for index, arg in enumerate(bound_arguments.args):
-        aparam: Parameter = list(signature.parameters.values())[index]
+        aparam: inspect.Parameter = list(signature.parameters.values())[index]
         new_args[index] = enrich(aparam, arg)
 
     argument_name: str
     argument: Any
     for argument_name, argument in bound_arguments.kwargs.items():
-        bparam: Parameter = signature.parameters[argument_name]
+        bparam: inspect.Parameter = signature.parameters[argument_name]
 
         new_kwargs[argument_name] = enrich(bparam, argument)
 
-    return (new_args, new_kwargs)
+    return (tuple(new_args), new_kwargs)
+
+
+def parse(value: Any, /) -> Any:
+    if value is inspect._empty:
+        return Missing
+
+    return value
+
+
+def get_params(func: Callable[PS, RT], /) -> Dict[str, Parameter]:
+    return {
+        parameter.name: Parameter(
+            name=parameter.name,
+            annotation=parse(parameter.annotation),
+            kind=getattr(ParameterKind, parameter.kind.name),
+            default=parse(parameter.default),
+        )
+        for parameter in inspect.signature(func).parameters.values()
+    }
 
 
 def params(func: Callable[PS, RT], /) -> Callable[PS, RT]:
     @functools.wraps(func)
     def wrapper(*args: PS.args, **kwargs: PS.kwargs) -> RT:
-        new_args: Tuple[Any]
+        new_args: Tuple[Any, ...]
         new_kwargs: Dict[str, Any]
         new_args, new_kwargs = get_arguments(func, args, kwargs)
 

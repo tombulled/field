@@ -1,10 +1,11 @@
+from dataclasses import dataclass
 from typing import Callable, Generic, NoReturn, TypeVar, Union
 from .sentinels import Missing, MissingType
 
 
 T = TypeVar("T")
 
-
+@dataclass(init=False, repr=False)
 class Param(Generic[T]):
     _default: Union[T, MissingType]
     _default_factory: Union[Callable[[], T], MissingType]

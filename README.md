@@ -1,4 +1,5 @@
 # param
+Enhanced function parameters
 
 ## Installation
 ```sh
