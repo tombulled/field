@@ -11,7 +11,7 @@ PS = ParamSpec("PS")
 RT = TypeVar("RT")
 
 
-def enrich(parameter: inspect.Parameter, argument: Any) -> Any:
+def _enrich(parameter: inspect.Parameter, argument: Any) -> Any:
     if not isinstance(argument, ParameterSpecification):
         return argument
 
@@ -38,19 +38,19 @@ def get_arguments(
     arg: Any
     for index, arg in enumerate(bound_arguments.args):
         aparam: inspect.Parameter = list(signature.parameters.values())[index]
-        new_args[index] = enrich(aparam, arg)
+        new_args[index] = _enrich(aparam, arg)
 
     argument_name: str
     argument: Any
     for argument_name, argument in bound_arguments.kwargs.items():
         bparam: inspect.Parameter = signature.parameters[argument_name]
 
-        new_kwargs[argument_name] = enrich(bparam, argument)
+        new_kwargs[argument_name] = _enrich(bparam, argument)
 
     return Arguments(args=tuple(new_args), kwargs=new_kwargs, arguments=arguments)
 
 
-def parse(value: Any, /) -> Any:
+def _parse(value: Any, /) -> Any:
     if value is inspect._empty:
         return Missing
 
@@ -65,12 +65,12 @@ def get_params(func: Callable[PS, RT], /) -> Dict[str, Parameter]:
         spec: ParameterSpecification = (
             parameter.default
             if isinstance(parameter.default, ParameterSpecification)
-            else ParameterSpecification(default=parse(parameter.default))
+            else ParameterSpecification(default=_parse(parameter.default))
         )
 
         param: Parameter = Parameter(
             name=parameter.name,
-            annotation=parse(parameter.annotation),
+            annotation=_parse(parameter.annotation),
             type=getattr(ParameterType, parameter.kind.name),
             spec=spec,
         )

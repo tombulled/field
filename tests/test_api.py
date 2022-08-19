@@ -6,11 +6,11 @@ from param.enums import ParameterType
 
 
 def test_parse_empty() -> None:
-    assert api.parse(inspect._empty) is Missing
+    assert api._parse(inspect._empty) is Missing
 
 
 def test_parse_not_empty() -> None:
-    assert api.parse(123) == 123
+    assert api._parse(123) == 123
 
 
 def test_get_params() -> None:
