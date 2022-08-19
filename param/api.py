@@ -1,7 +1,7 @@
 import functools
 import inspect
 from inspect import BoundArguments, Signature
-from typing import Any, Callable, Dict, List, Tuple, TypeVar
+from typing import Any, Callable, Dict, Tuple, TypeVar
 
 from typing_extensions import ParamSpec
 
@@ -13,40 +13,41 @@ PS = ParamSpec("PS")
 RT = TypeVar("RT")
 
 
-def _enrich(arguments: Dict[str, Any], /) -> Dict[str, Any]:
-    enriched_arguments: Dict[str, Any] = {}
-
-    argument_name: str
-    argument: Any
-    for argument_name, argument in arguments.items():
-        if not isinstance(argument, ParameterSpecification):
-            enriched_arguments[argument_name] = argument
-        elif not argument.has_default():
-            raise ValueError(f"missing argument: {argument_name}")
-        else:
-            enriched_arguments[argument_name] = argument.default
-
-    return enriched_arguments
-
-
-def get_arguments(
+def _get_bound_arguments(
     func: Callable[..., Any], args: Tuple[Any, ...], kwargs: Dict[str, Any]
-) -> Arguments:
+) -> Tuple[Dict[str, Any], Dict[str, Any]]:
     signature: Signature = inspect.signature(func)
 
     bound_arguments: BoundArguments = signature.bind(*args, **kwargs)
 
     bound_arguments.apply_defaults()
 
-    parameters: Dict[str, Parameter] = get_params(func)
+    bound_args: Dict[str, Any] = dict(zip(signature.parameters, bound_arguments.args))
+    bound_kwargs: Dict[str, Any] = bound_arguments.kwargs
 
-    keyed_args: Dict[str, Any] = {
-        list(signature.parameters.values())[index].name: arg
-        for index, arg in enumerate(bound_arguments.args)
-    }
+    return (bound_args, bound_kwargs)
 
-    new_args: Dict[str, Any] = _enrich(keyed_args)
-    new_kwargs: Dict[str, Any] = _enrich(bound_arguments.kwargs)
+
+def get_arguments(
+    func: Callable[..., Any], args: Tuple[Any, ...], kwargs: Dict[str, Any]
+) -> Arguments:
+    new_args: Dict[str, Any]
+    new_kwargs: Dict[str, Any]
+
+    new_args, new_kwargs = _get_bound_arguments(func, args, kwargs)
+
+    source: Dict[str, Any]
+    for source in (new_args, new_kwargs):
+        parameter: str
+        argument: Any
+        for parameter, argument in source.items():
+            if isinstance(argument, ParameterSpecification):
+                if not argument.has_default():
+                    raise ValueError(f"{func.__name__}() missing argument: {parameter}")
+                else:
+                    source[parameter] = argument.get_default()
+            else:
+                source[parameter] = argument
 
     return Arguments(
         args=tuple(new_args.values()),
