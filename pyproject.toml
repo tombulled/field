@@ -4,6 +4,10 @@ version = "0.1.0"
 description = "Enhanced function parameters"
 authors = ["Tom Bulled <26026015+tombulled@users.noreply.github.com>"]
 license = "MIT"
+readme = "README.md"
+homepage = "https://pypi.org/project/param/"
+repository = "https://github.com/tombulled/param"
+keywords = ["python", "param"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
