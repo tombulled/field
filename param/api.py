@@ -5,7 +5,7 @@ import functools
 from inspect import BoundArguments, Signature
 from .param import Param
 from .models import Parameter, Arguments
-from .enums import ParameterKind
+from .enums import ParameterType
 from .sentinels import Missing
 
 PS = ParamSpec("PS")
@@ -72,7 +72,7 @@ def get_params(func: Callable[PS, RT], /) -> Dict[str, Parameter]:
         param: Parameter = Parameter(
             name=parameter.name,
             annotation=parse(parameter.annotation),
-            kind=getattr(ParameterKind, parameter.kind.name),
+            type=getattr(ParameterType, parameter.kind.name),
             spec=spec,
         )
 

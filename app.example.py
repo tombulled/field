@@ -1,7 +1,7 @@
 from param import Param, params
 
 @params
-def say(message: str = Param(default="Hello, World!")):
-    print(message)
+def get(url: str, params: dict = Param(default_factory=dict)):
+    print("GET", url, params)
 
-say("Hello, Bob!")
+get("https://httpbin.com/get")
