@@ -7,34 +7,14 @@ from .sentinels import Missing, MissingType
 T = TypeVar("T")
 
 
-@dataclass(repr=False, frozen=True, eq=True)
+@dataclass(frozen=True, eq=True)
 class ParameterSpecification(Generic[T]):
     default: Union[T, MissingType] = Missing
     default_factory: Union[Callable[[], T], MissingType] = Missing
 
-    # def __init__(
-    #     self,
-    #     *,
-    #     default: Union[T, MissingType] = Missing,
-    #     default_factory: Union[Callable[[], T], MissingType] = Missing,
-    # ):
-    #     if default is not Missing and default_factory is not Missing:
-    #         raise ValueError("cannot specify both `default` and `default_factory`")
-
-    #     self._default = default
-    #     self._default_factory = default_factory
-
     def __post_init__(self):
         if self.default is not Missing and self.default_factory is not Missing:
             raise ValueError("cannot specify both `default` and `default_factory`")
-
-    def __repr__(self) -> str:
-        if self.default_factory is not Missing:
-            return f"{type(self).__name__}(default_factory={self.default_factory!r})"
-        elif self.default is not Missing:
-            return f"{type(self).__name__}(default={self.default!r})"
-
-        return f"{type(self).__name__}()"
 
     def get_default(self) -> Union[T, MissingType]:
         if self.default_factory is not Missing:
