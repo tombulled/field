@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "param"
+name = "tombulled-param"
 version = "0.1.0"
 description = "Enhanced function parameters"
 authors = ["Tom Bulled <26026015+tombulled@users.noreply.github.com>"]
@@ -8,6 +8,9 @@ readme = "README.md"
 homepage = "https://pypi.org/project/param/"
 repository = "https://github.com/tombulled/param"
 keywords = ["python", "param"]
+packages = [
+    {include = "param"}
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
