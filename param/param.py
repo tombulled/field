@@ -24,9 +24,9 @@ class Param(Generic[T]):
 
     def __repr__(self) -> str:
         if self._default_factory is not Missing:
-            return f"{type(self).__name__}(default_factory={self._default_factory})"
+            return f"{type(self).__name__}(default_factory={self._default_factory!r})"
         elif self._default is not Missing:
-            return f"{type(self).__name__}(default={self._default})"
+            return f"{type(self).__name__}(default={self._default!r})"
 
         return f"{type(self).__name__}()"
 

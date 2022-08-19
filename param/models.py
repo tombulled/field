@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
 from typing import Any, Dict, Tuple
 from .enums import ParameterKind
+from .param import Param
 
 
 @dataclass
@@ -15,4 +16,5 @@ class Parameter:
     name: str
     annotation: Any
     kind: ParameterKind
-    default: Any
+    # default: Any
+    spec: Param

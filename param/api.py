@@ -58,15 +58,26 @@ def parse(value: Any, /) -> Any:
 
 
 def get_params(func: Callable[PS, RT], /) -> Dict[str, Parameter]:
-    return {
-        parameter.name: Parameter(
+    params: Dict[str, Parameter] = {}
+
+    parameter: inspect.Parameter
+    for parameter in inspect.signature(func).parameters.values():
+        spec: Param = (
+            parameter.default
+            if isinstance(parameter.default, Param)
+            else Param(default=parse(parameter.default))
+        )
+
+        param: Parameter = Parameter(
             name=parameter.name,
             annotation=parse(parameter.annotation),
             kind=getattr(ParameterKind, parameter.kind.name),
-            default=parse(parameter.default),
+            spec=spec,
         )
-        for parameter in inspect.signature(func).parameters.values()
-    }
+
+        params[parameter.name] = param
+
+    return params
 
 
 def params(func: Callable[PS, RT], /) -> Callable[PS, RT]:
