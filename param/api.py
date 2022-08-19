@@ -30,7 +30,7 @@ def get_arguments(
 
     bound_arguments.apply_defaults()
 
-    arguments: Dict[str, Any] = dict(bound_arguments.arguments)
+    arguments: Dict[str, Any] = {}
     new_args: List[Any] = list(bound_arguments.args)
     new_kwargs: Dict[str, Any] = dict(bound_arguments.kwargs)
 
@@ -39,6 +39,7 @@ def get_arguments(
     for index, arg in enumerate(bound_arguments.args):
         aparam: inspect.Parameter = list(signature.parameters.values())[index]
         new_args[index] = _enrich(aparam, arg)
+        arguments[aparam.name] = _enrich(aparam, arg)
 
     argument_name: str
     argument: Any
@@ -46,6 +47,7 @@ def get_arguments(
         bparam: inspect.Parameter = signature.parameters[argument_name]
 
         new_kwargs[argument_name] = _enrich(bparam, argument)
+        arguments[argument_name] = _enrich(bparam, argument)
 
     return Arguments(args=tuple(new_args), kwargs=new_kwargs, arguments=arguments)
 
