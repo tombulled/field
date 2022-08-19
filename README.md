@@ -3,7 +3,7 @@ Enhanced function parameters
 
 ## Installation
 ```sh
-pip install git+https://github.com/tombulled/field.git@main
+pip install git+https://github.com/tombulled/param.git@main
 ```
 
 ## Usage
