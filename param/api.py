@@ -3,8 +3,7 @@ from typing import Any, Callable, Dict, List, Tuple, TypeVar
 from typing_extensions import ParamSpec
 import functools
 from inspect import BoundArguments, Signature
-from .param import Param
-from .models import Parameter, Arguments
+from .models import Parameter, Arguments, ParameterSpecification
 from .enums import ParameterType
 from .sentinels import Missing
 
@@ -13,7 +12,7 @@ RT = TypeVar("RT")
 
 
 def enrich(parameter: inspect.Parameter, argument: Any) -> Any:
-    if not isinstance(argument, Param):
+    if not isinstance(argument, ParameterSpecification):
         return argument
 
     if not argument.has_default():
@@ -23,7 +22,7 @@ def enrich(parameter: inspect.Parameter, argument: Any) -> Any:
 
 
 def get_arguments(
-    func: Callable[..., Any], args: Tuple[Any], kwargs: Dict[str, Any]
+    func: Callable[..., Any], args: Tuple[Any, ...], kwargs: Dict[str, Any]
 ) -> Arguments:
     signature: Signature = inspect.signature(func)
 
@@ -63,10 +62,10 @@ def get_params(func: Callable[PS, RT], /) -> Dict[str, Parameter]:
 
     parameter: inspect.Parameter
     for parameter in inspect.signature(func).parameters.values():
-        spec: Param = (
+        spec: ParameterSpecification = (
             parameter.default
-            if isinstance(parameter.default, Param)
-            else Param(default=parse(parameter.default))
+            if isinstance(parameter.default, ParameterSpecification)
+            else ParameterSpecification(default=parse(parameter.default))
         )
 
         param: Parameter = Parameter(
