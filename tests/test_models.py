@@ -1,10 +1,9 @@
 import pytest
-from param import ParameterSpecification
+from param import ParameterSpecification, Missing
 
 
 def test_param_spec_no_default() -> None:
-    with pytest.raises(Exception):
-        ParameterSpecification().default
+    assert ParameterSpecification().default is Missing
 
 
 def test_param_spec_default() -> None:

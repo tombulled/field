@@ -33,13 +33,13 @@ class ParameterSpecification(Generic[T]):
         return f"{type(self).__name__}()"
 
     @property
-    def default(self) -> Union[T, NoReturn]:
+    def default(self) -> Union[T, MissingType]:
         if self._default_factory is not Missing:
             return self._default_factory()
         elif self._default is not Missing:
             return self._default
 
-        raise Exception("There is no default")
+        return Missing
 
     def has_default(self) -> bool:
         return self._default is not Missing or self._default_factory is not Missing
