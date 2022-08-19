@@ -1,6 +1,7 @@
-from typing import Callable, Union, TypeVar
-from .sentinels import MissingType, Missing
+from typing import Callable, TypeVar, Union
+
 from .models import ParameterSpecification
+from .sentinels import Missing, MissingType
 
 T = TypeVar("T")
 

@@ -2,6 +2,10 @@ import pytest
 from param import Param, ParameterSpecification
 
 
+def test_wrapper_no_default() -> None:
+    assert Param() == ParameterSpecification()
+
+
 def test_wrapper_default() -> None:
     assert Param(default=123) == ParameterSpecification(default=123)
 
@@ -12,4 +16,4 @@ def test_wrapper_default_factory() -> None:
 
 def test_wrapper_default_and_default_factory() -> None:
     with pytest.raises(ValueError):
-        Param(default=123, default_factory=dict)
+        Param(default=123, default_factory=lambda: 123)

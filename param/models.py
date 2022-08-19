@@ -57,5 +57,4 @@ class Parameter:
     name: str
     annotation: Any
     type: ParameterType
-    # default: Any
     spec: ParameterSpecification
