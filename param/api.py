@@ -13,14 +13,20 @@ PS = ParamSpec("PS")
 RT = TypeVar("RT")
 
 
-def _enrich(parameter: inspect.Parameter, argument: Any) -> Any:
-    if not isinstance(argument, ParameterSpecification):
-        return argument
+def _enrich(arguments: Dict[str, Any], /) -> Dict[str, Any]:
+    enriched_arguments: Dict[str, Any] = {}
 
-    if not argument.has_default():
-        raise ValueError(f"missing argument: {parameter.name}")
+    argument_name: str
+    argument: Any
+    for argument_name, argument in arguments.items():
+        if not isinstance(argument, ParameterSpecification):
+            enriched_arguments[argument_name] = argument
+        elif not argument.has_default():
+            raise ValueError(f"missing argument: {argument_name}")
+        else:
+            enriched_arguments[argument_name] = argument.default
 
-    return argument.default
+    return enriched_arguments
 
 
 def get_arguments(
@@ -32,26 +38,21 @@ def get_arguments(
 
     bound_arguments.apply_defaults()
 
-    arguments: Dict[str, Any] = {}
-    new_args: List[Any] = list(bound_arguments.args)
-    new_kwargs: Dict[str, Any] = dict(bound_arguments.kwargs)
+    parameters: Dict[str, Parameter] = get_params(func)
 
-    index: int
-    arg: Any
-    for index, arg in enumerate(bound_arguments.args):
-        aparam: inspect.Parameter = list(signature.parameters.values())[index]
-        new_args[index] = _enrich(aparam, arg)
-        arguments[aparam.name] = _enrich(aparam, arg)
+    keyed_args: Dict[str, Any] = {
+        list(signature.parameters.values())[index].name: arg
+        for index, arg in enumerate(bound_arguments.args)
+    }
 
-    argument_name: str
-    argument: Any
-    for argument_name, argument in bound_arguments.kwargs.items():
-        bparam: inspect.Parameter = signature.parameters[argument_name]
+    new_args: Dict[str, Any] = _enrich(keyed_args)
+    new_kwargs: Dict[str, Any] = _enrich(bound_arguments.kwargs)
 
-        new_kwargs[argument_name] = _enrich(bparam, argument)
-        arguments[argument_name] = _enrich(bparam, argument)
-
-    return Arguments(args=tuple(new_args), kwargs=new_kwargs, arguments=arguments)
+    return Arguments(
+        args=tuple(new_args.values()),
+        kwargs=new_kwargs,
+        arguments={**new_args, **new_kwargs},
+    )
 
 
 def _parse(value: Any, /) -> Any:

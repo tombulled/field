@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Generic, NoReturn, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, Tuple, TypeVar, Union
 
 from .enums import ParameterType
 from .sentinels import Missing, MissingType
