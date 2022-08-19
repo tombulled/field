@@ -1,12 +1,9 @@
-from enum import Enum, auto
+from enum import auto
 from typing import Literal
 
 from typing_extensions import TypeAlias
 
-
-class NoValue(Enum):
-    def __repr__(self) -> str:
-        return f"<{type(self).__name__}.{self.name}>"
+from .enums import NoValue
 
 
 class Sentinel(NoValue):
