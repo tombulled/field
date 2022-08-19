@@ -48,8 +48,12 @@ def test_get_arguments() -> None:
         args=(123, "b", True), kwargs={}, arguments={"a": 123, "b": "b", "c": True}
     )
 
+
 def test_get_bound_arguments() -> None:
     def func(a: int, b: str = "b", c: bool = Param(default=True)) -> None:
         ...
 
-    assert api._get_bound_arguments(func, (123,), {}) == ({"a": 123, "b": "b", "c": Param(default=True)}, {})
+    assert api._get_bound_arguments(func, (123,), {}) == (
+        {"a": 123, "b": "b", "c": Param(default=True)},
+        {},
+    )
