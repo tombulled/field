@@ -1,8 +1,10 @@
 import param
 
 
-def func(a: int, b: str = "b", **c: bool) -> None:
+@param.params
+def func(a: int, b: str = "b", c: bool = param.Param(default=False), **d: bool) -> None:
     ...
 
 
-d = param.get_params(func)
+p = param.get_params(func)
+a = param.get_arguments(func, (123,), {})

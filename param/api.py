@@ -4,7 +4,7 @@ from typing_extensions import ParamSpec
 import functools
 from inspect import BoundArguments, Signature
 from .param import Param
-from .models import Parameter
+from .models import Parameter, Arguments
 from .enums import ParameterKind
 from .sentinels import Missing
 
@@ -24,13 +24,14 @@ def enrich(parameter: inspect.Parameter, argument: Any) -> Any:
 
 def get_arguments(
     func: Callable[..., Any], args: Tuple[Any], kwargs: Dict[str, Any]
-) -> Tuple[Tuple[Any, ...], Dict[str, Any]]:
+) -> Arguments:
     signature: Signature = inspect.signature(func)
 
     bound_arguments: BoundArguments = signature.bind(*args, **kwargs)
 
     bound_arguments.apply_defaults()
 
+    arguments: Dict[str, Any] = dict(bound_arguments.arguments)
     new_args: List[Any] = list(bound_arguments.args)
     new_kwargs: Dict[str, Any] = dict(bound_arguments.kwargs)
 
@@ -47,7 +48,7 @@ def get_arguments(
 
         new_kwargs[argument_name] = enrich(bparam, argument)
 
-    return (tuple(new_args), new_kwargs)
+    return Arguments(args=tuple(new_args), kwargs=new_kwargs, arguments=arguments)
 
 
 def parse(value: Any, /) -> Any:
@@ -83,10 +84,8 @@ def get_params(func: Callable[PS, RT], /) -> Dict[str, Parameter]:
 def params(func: Callable[PS, RT], /) -> Callable[PS, RT]:
     @functools.wraps(func)
     def wrapper(*args: PS.args, **kwargs: PS.kwargs) -> RT:
-        new_args: Tuple[Any, ...]
-        new_kwargs: Dict[str, Any]
-        new_args, new_kwargs = get_arguments(func, args, kwargs)
+        arguments: Arguments = get_arguments(func, args, kwargs)
 
-        return func(*new_args, **new_kwargs)
+        return func(*arguments.args, **arguments.kwargs)
 
     return wrapper
