@@ -1,7 +1,7 @@
 from param import api
 import inspect
 from param.sentinels import Missing
-from param.models import Arguments, Parameter, ParameterSpecification
+from param.models import Arguments, Parameter
 from param.enums import ParameterType
 from param.wrappers import Param
 
@@ -23,19 +23,19 @@ def test_get_params() -> None:
             name="a",
             annotation=int,
             type=ParameterType.POSITIONAL_OR_KEYWORD,
-            spec=ParameterSpecification(),
+            spec=Param(),
         ),
         "b": Parameter(
             name="b",
             annotation=str,
             type=ParameterType.POSITIONAL_OR_KEYWORD,
-            spec=ParameterSpecification(default="b"),
+            spec=Param(default="b"),
         ),
         "c": Parameter(
             name="c",
             annotation=bool,
             type=ParameterType.VAR_KEYWORD,
-            spec=ParameterSpecification(),
+            spec=Param(),
         ),
     }
 

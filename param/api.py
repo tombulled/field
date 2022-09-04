@@ -6,7 +6,7 @@ from typing import Any, Callable, Dict, Tuple, TypeVar
 from typing_extensions import ParamSpec
 
 from .enums import ParameterType
-from .models import Arguments, Parameter, ParameterSpecification
+from .models import Arguments, Parameter, ParameterSpecification, Param
 from .sentinels import Missing
 
 PS = ParamSpec("PS")
@@ -42,10 +42,13 @@ def get_arguments(
         argument: Any
         for parameter, argument in source.items():
             if isinstance(argument, ParameterSpecification):
-                if not argument.has_default():
-                    raise ValueError(f"{func.__name__}() missing argument: {parameter}")
+                if isinstance(argument, Param):
+                    if not argument.has_default():
+                        raise ValueError(f"{func.__name__}() missing argument: {parameter}")
+                    else:
+                        source[parameter] = argument.get_default()
                 else:
-                    source[parameter] = argument.get_default()
+                    raise Exception(f"Unknown parameter specification: {argument!r}")
             else:
                 source[parameter] = argument
 
@@ -71,7 +74,7 @@ def get_params(func: Callable[PS, RT], /) -> Dict[str, Parameter]:
         spec: ParameterSpecification = (
             parameter.default
             if isinstance(parameter.default, ParameterSpecification)
-            else ParameterSpecification(default=_parse(parameter.default))
+            else Param(default=_parse(parameter.default))
         )
 
         param: Parameter = Parameter(

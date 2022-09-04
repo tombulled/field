@@ -1,3 +1,4 @@
+from abc import ABC
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Generic, Tuple, TypeVar, Union
 
@@ -6,9 +7,11 @@ from .sentinels import Missing, MissingType
 
 T = TypeVar("T")
 
+class ParameterSpecification(ABC): pass
+
 
 @dataclass(frozen=True)
-class ParameterSpecification(Generic[T]):
+class Param(Generic[T], ParameterSpecification):
     default: Union[T, MissingType] = Missing
     default_factory: Union[Callable[[], T], MissingType] = Missing
 
