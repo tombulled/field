@@ -6,8 +6,11 @@ from .enums import ParameterType
 from .sentinels import Missing, MissingType
 
 T = TypeVar("T")
+PT = TypeVar("PT", bound="ParameterSpecification")
 
-class ParameterSpecification(ABC): pass
+
+class ParameterSpecification(ABC):
+    pass
 
 
 @dataclass(frozen=True)
@@ -39,8 +42,8 @@ class Arguments:
 
 
 @dataclass(frozen=True)
-class Parameter:
+class Parameter(Generic[PT]):
     name: str
-    annotation: Any
-    type: ParameterType
-    spec: ParameterSpecification
+    spec: PT
+    type: ParameterType = ParameterType.POSITIONAL_OR_KEYWORD
+    annotation: Union[Any, MissingType] = Missing
