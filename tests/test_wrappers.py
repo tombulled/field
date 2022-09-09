@@ -1,17 +1,19 @@
 import pytest
-from param import models, wrappers
+from param import parameters, wrappers
 
 
 def test_wrapper_no_default() -> None:
-    assert wrappers.Param() == models.Param()
+    assert wrappers.Param() == parameters.Param()
 
 
 def test_wrapper_default() -> None:
-    assert wrappers.Param(default=123) == models.Param(default=123)
+    assert wrappers.Param(default=123) == parameters.Param(default=123)
 
 
 def test_wrapper_default_factory() -> None:
-    assert wrappers.Param(default_factory=dict) == models.Param(default_factory=dict)
+    assert wrappers.Param(default_factory=dict) == parameters.Param(
+        default_factory=dict
+    )
 
 
 def test_wrapper_default_and_default_factory() -> None:

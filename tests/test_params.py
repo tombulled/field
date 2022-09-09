@@ -1,6 +1,6 @@
 import pytest
 from param import Missing
-from param.models import Param
+from param.parameters import Param
 
 
 def test_param_spec_no_default() -> None:

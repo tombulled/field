@@ -179,6 +179,14 @@ tomli = ">=1.0.0"
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "pygments (>=2.7.2)", "requests", "xmlschema"]
 
 [[package]]
+name = "roster"
+version = "0.1.8"
+description = "Python object registers. Keep track of your classes, functions and data."
+category = "main"
+optional = false
+python-versions = ">=3.8,<4.0"
+
+[[package]]
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
@@ -197,7 +205,7 @@ python-versions = ">=3.7"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "5ca0cab5919b5831b819dd443ef57319c9e65f5b10898d53da568800e6b87e86"
+content-hash = "065121b241808e43229b5c05bfcd39a1b9424b38255ce79c4920d6599c47cb87"
 
 [metadata.files]
 atomicwrites = []
@@ -244,6 +252,10 @@ pyparsing = [
 pytest = [
     {file = "pytest-7.1.2-py3-none-any.whl", hash = "sha256:13d0e3ccfc2b6e26be000cb6568c832ba67ba32e719443bfe725814d3c42433c"},
     {file = "pytest-7.1.2.tar.gz", hash = "sha256:a06a0425453864a270bc45e71f783330a7428defb4230fb5e6a731fde06ecd45"},
+]
+roster = [
+    {file = "roster-0.1.8-py3-none-any.whl", hash = "sha256:1996902111671440965a0031a8e4e1e55adf8f40d07836da10a66554584ba763"},
+    {file = "roster-0.1.8.tar.gz", hash = "sha256:adbe7a9e035aa9b3220892663dc99eba3af8cf91bc13ad267ca8ab255d9f0fb5"},
 ]
 tomli = [
     {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
