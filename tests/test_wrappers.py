@@ -18,4 +18,4 @@ def test_wrapper_default_factory() -> None:
 
 def test_wrapper_default_and_default_factory() -> None:
     with pytest.raises(ValueError):
-        wrappers.Param(default=123, default_factory=lambda: 123)
+        wrappers.Param(default=123, default_factory=lambda: 123)  # type: ignore

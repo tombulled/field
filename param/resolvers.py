@@ -1,10 +1,10 @@
-from typing import Any, Protocol, Type, Union
+from typing import Any, Optional, Protocol, Type, Union
 
 from roster import Register
 
 from .errors import ResolutionError
 from .models import Parameter
-from .parameters import ParameterSpecification, Param
+from .parameters import Param, ParameterSpecification
 from .sentinels import Missing, MissingType
 
 
@@ -16,16 +16,26 @@ class Resolver(Protocol):
 
 
 class Resolvers(Register[Type[ParameterSpecification], Resolver]):
+    def get_resolver(
+        self, parameter_cls: Type[ParameterSpecification], /
+    ) -> Optional[Resolver]:
+        resolver_cls: Type[ParameterSpecification]
+        resolver: Resolver
+        for resolver_cls, resolver in self.items():
+            if parameter_cls is resolver_cls:
+                return resolver
+
+        return None
+
     def resolve(
         self, parameter: Parameter, value: Union[Any, MissingType] = Missing, /
     ) -> Any:
-        parameter_cls: Type[ParameterSpecification]
-        resolver: Resolver
-        for parameter_cls, resolver in self.items():
-            if type(parameter.spec) is parameter_cls:
-                return resolver(parameter, value)
+        resolver: Optional[Resolver] = self.get_resolver(type(parameter.spec))
 
-        raise ResolutionError(f"No resolver for parameter {parameter}")
+        if resolver is not None:
+            return resolver(parameter, value)
+        else:
+            raise ResolutionError(f"No resolver for parameter {parameter}")
 
 
 resolvers: Resolvers = Resolvers()

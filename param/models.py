@@ -1,10 +1,11 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, Generic, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, Tuple, TypeVar, Union
 
 from .enums import ParameterType
-from .sentinels import Missing, MissingType
 from .parameters import ParameterSpecification
+from .sentinels import Missing, MissingType
 
+T = TypeVar("T")
 PT = TypeVar("PT", bound=ParameterSpecification)
 
 
@@ -12,7 +13,18 @@ PT = TypeVar("PT", bound=ParameterSpecification)
 class Arguments:
     args: Tuple[Any, ...] = field(default_factory=tuple)
     kwargs: Dict[str, Any] = field(default_factory=dict)
-    arguments: Dict[str, Any] = field(default_factory=dict)
+
+    def call(self, func: Callable[..., T], /) -> T:
+        return func(*self.args, **self.kwargs)
+
+
+@dataclass(frozen=True)
+class BoundArguments:
+    args: Dict[str, Any] = field(default_factory=dict)
+    kwargs: Dict[str, Any] = field(default_factory=dict)
+
+    def call(self, func: Callable[..., T], /) -> T:
+        return func(*self.args.values(), **self.kwargs)
 
 
 @dataclass(frozen=True)

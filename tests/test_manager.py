@@ -1,25 +1,25 @@
-from param import api
 import inspect
-from param import parameters
-from param.sentinels import Missing
-from param.models import Arguments, Parameter
+
+from param import decorators, manager, parameters
 from param.enums import ParameterType
+from param.models import Arguments, BoundArguments, Parameter
+from param.sentinels import Missing
 from param.wrappers import Param
 
 
 def test_parse_empty() -> None:
-    assert api._parse(inspect._empty) is Missing
+    assert manager._parse(inspect._empty) is Missing
 
 
 def test_parse_not_empty() -> None:
-    assert api._parse(123) == 123
+    assert manager._parse(123) == 123
 
 
 def test_get_params() -> None:
     def func(a: int, b: str = "b", **c: bool) -> None:
         ...
 
-    assert api.get_params(func) == {
+    assert decorators.MANAGER.get_params(func) == {
         "a": Parameter(
             name="a",
             annotation=int,
@@ -45,16 +45,16 @@ def test_get_arguments() -> None:
     def func(a: int, b: str = "b", c: bool = Param(default=True)) -> None:
         ...
 
-    assert api.get_arguments(func, (123,), {}) == Arguments(
-        args=(123, "b", True), kwargs={}, arguments={"a": 123, "b": "b", "c": True}
-    )
+    assert decorators.MANAGER.get_arguments(
+        func, Arguments(args=(123,))
+    ) == BoundArguments(args={"a": 123, "b": "b", "c": True}, kwargs={})
 
 
 def test_get_bound_arguments() -> None:
     def func(a: int, b: str = "b", c: bool = Param(default=True)) -> None:
         ...
 
-    assert api._get_bound_arguments(func, (123,), {}) == (
-        {"a": 123, "b": "b", "c": Param(default=True)},
-        {},
+    assert manager._get_bound_arguments(func, Arguments(args=(123,))) == BoundArguments(
+        args={"a": 123, "b": "b", "c": Param(default=True)},
+        kwargs={},
     )

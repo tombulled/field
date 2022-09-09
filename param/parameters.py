@@ -1,6 +1,6 @@
 from abc import ABC
-from typing import Callable, TypeVar, Union, Generic
 from dataclasses import dataclass
+from typing import Callable, Generic, TypeVar, Union
 
 from .sentinels import Missing, MissingType
 

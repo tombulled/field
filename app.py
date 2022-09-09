@@ -3,10 +3,13 @@ from typing import Any, Dict, Union
 
 from param.parameters import Param
 from param.sentinels import Missing, MissingType
-from param.api import get_params, get_arguments
+from param.decorators import MANAGER
 from param.resolvers import resolvers
-from param.models import Parameter
+from param.models import Parameter, Arguments
 from param.errors import ResolutionError
+
+get_arguments = MANAGER.get_arguments
+get_params = MANAGER.get_params
 
 """
 Composer:
@@ -43,9 +46,9 @@ def resolve_query(
         raise ResolutionError("No value provided and parameter has no default")
 
 
-def foo(bar: str = Query()):
+def foo(bar: str = Query(default="default")):
     ...
 
 
-d = get_arguments(foo, (), {})
-d2 = get_arguments(foo, ("bar",), {})
+d = get_arguments(foo, Arguments())
+d2 = get_arguments(foo, Arguments(args=("bar",)))
