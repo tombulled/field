@@ -1,4 +1,4 @@
-from typing import Any, Optional, Protocol, Type, Union
+from typing import Any, Optional, Protocol, Type, Union, TypeVar
 
 from roster import Register
 
@@ -7,22 +7,23 @@ from .models import Parameter
 from .parameters import Param, ParameterSpecification
 from .sentinels import Missing, MissingType
 
+T = TypeVar("T")
+T_co = TypeVar("T_co", contravariant=True)
 
-# NOTE: Change signature to (manager: ParameterManager, parameters: Sequence[Parameter], arguments: Dict[str, Any])
-# NOTE: Depends could just access the MANAGER instance? (likely to cause a dependency hell conflict)
-class Resolver(Protocol):
+
+class Resolver(Protocol[T_co]):
     def __call__(
-        self, parameter: Parameter, value: Union[Any, MissingType] = Missing, /
+        self, parameter: Parameter, value: T_co, /
     ) -> Any:
         ...
 
 
-class Resolvers(Register[Type[ParameterSpecification], Resolver]):
+class Resolvers(Register[Type[ParameterSpecification], Resolver[T]]):
     def get_resolver(
         self, parameter_cls: Type[ParameterSpecification], /
-    ) -> Optional[Resolver]:
+    ) -> Optional[Resolver[T]]:
         resolver_cls: Type[ParameterSpecification]
-        resolver: Resolver
+        resolver: Resolver[T]
     # TODO: Implement the below method
         for resolver_cls, resolver in self.items():
             if parameter_cls is resolver_cls:
@@ -31,9 +32,9 @@ class Resolvers(Register[Type[ParameterSpecification], Resolver]):
         return None
 
     def resolve(
-        self, parameter: Parameter, value: Union[Any, MissingType] = Missing, /
+        self, parameter: Parameter, value: T, /
     ) -> Any:
-        resolver: Optional[Resolver] = self.get_resolver(type(parameter.spec))
+        resolver: Optional[Resolver[T]] = self.get_resolver(type(parameter.spec))
 
         if resolver is not None:
             return resolver(parameter, value)
@@ -42,7 +43,7 @@ class Resolvers(Register[Type[ParameterSpecification], Resolver]):
 
 
 def resolve_param(
-    parameter: Parameter[Param], value: Union[Any, MissingType] = Missing, /
+    parameter: Parameter[Param], value: Union[Any, MissingType], /
 ) -> Any:
     if value is not Missing:
         return value

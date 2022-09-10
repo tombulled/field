@@ -1,13 +1,15 @@
 import inspect
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict
+from typing import Any, Callable, Dict, Generic, Union, TypeVar
 
 from .enums import ParameterType
 from .errors import MissingSpecification
 from .models import Arguments, BoundArguments, Parameter
 from .parameters import Param, ParameterSpecification
 from .resolvers import Resolvers, resolve_param
-from .sentinels import Missing
+from .sentinels import Missing, MissingType
+
+T = TypeVar("T")
 
 
 def _parse(value: Any, /) -> Any:
@@ -31,8 +33,8 @@ def _bind_arguments(func: Callable[..., Any], arguments: Arguments) -> BoundArgu
 
 
 @dataclass
-class ParameterManager:
-    resolvers: Resolvers
+class ParameterManager(Generic[T]):
+    resolvers: Resolvers[T]
 
     def get_params(self, func: Callable, /) -> Dict[str, Parameter]:
         params: Dict[str, Parameter] = {}
@@ -104,8 +106,8 @@ class ParameterManager:
 
 
 @dataclass
-class ParamManager(ParameterManager):
-    resolvers: Resolvers = field(
+class ParamManager(ParameterManager[Union[Any, MissingType]]):
+    resolvers: Resolvers[Union[Any, MissingType]] = field(
         default_factory=lambda: Resolvers({Param: resolve_param})
     )
 
