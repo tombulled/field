@@ -30,7 +30,6 @@ def _bind_arguments(func: Callable[..., Any], arguments: Arguments) -> BoundArgu
     return BoundArguments(args=bound_args, kwargs=bound_kwargs)
 
 
-@dataclass
 class ParameterManager(ABC):
     resolvers: Resolvers
 
