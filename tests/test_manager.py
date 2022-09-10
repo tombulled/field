@@ -1,6 +1,7 @@
 import inspect
 
-from param import decorators, manager, parameters
+from param import manager, parameters
+from param.api import get_arguments, get_params
 from param.enums import ParameterType
 from param.models import Arguments, BoundArguments, Parameter
 from param.sentinels import Missing
@@ -19,7 +20,7 @@ def test_get_params() -> None:
     def func(a: int, b: str = "b", **c: bool) -> None:
         ...
 
-    assert decorators.MANAGER.get_params(func) == {
+    assert get_params(func) == {
         "a": Parameter(
             name="a",
             annotation=int,
@@ -45,7 +46,7 @@ def test_get_arguments() -> None:
     def func(a: int, b: str = "b", c: bool = Param(default=True)) -> None:
         ...
 
-    assert decorators.MANAGER.get_arguments(
+    assert get_arguments(
         func, Arguments(args=(123,))
     ) == BoundArguments(args={"a": 123, "b": "b", "c": True}, kwargs={})
 
