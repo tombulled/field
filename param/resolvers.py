@@ -9,6 +9,7 @@ from .sentinels import Missing, MissingType
 
 
 # NOTE: Change signature to (manager: ParameterManager, parameters: Sequence[Parameter], arguments: Dict[str, Any])
+# NOTE: Depends could just access the MANAGER instance? (likely to cause a dependency hell conflict)
 class Resolver(Protocol):
     def __call__(
         self, parameter: Parameter, value: Union[Any, MissingType] = Missing, /
