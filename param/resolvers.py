@@ -7,43 +7,36 @@ from .models import Parameter
 from .parameters import Param, ParameterSpecification
 from .sentinels import Missing, MissingType
 
-T = TypeVar("T")
-T_co = TypeVar("T_co", contravariant=True)
+C = TypeVar("C")
+C_co = TypeVar("C_co", contravariant=True)
 
 
-class Resolver(Protocol[T_co]):
+class Resolver(Protocol[C_co]):
     def __call__(
-        self, parameter: Parameter, value: T_co, /
+        self, parameter: Parameter, context: C_co, value: Union[Any, MissingType], /
     ) -> Any:
         ...
 
 
-class Resolvers(Register[Type[ParameterSpecification], Resolver[T]]):
+class Resolvers(Register[Type[ParameterSpecification], Resolver[C]]):
     def get_resolver(
         self, parameter_cls: Type[ParameterSpecification], /
-    ) -> Optional[Resolver[T]]:
-        resolver_cls: Type[ParameterSpecification]
-        resolver: Resolver[T]
-    # TODO: Implement the below method
-        for resolver_cls, resolver in self.items():
-            if parameter_cls is resolver_cls:
-                return resolver
-
-        return None
+    ) -> Optional[Resolver[C]]:
+        return self.get(parameter_cls)
 
     def resolve(
-        self, parameter: Parameter, value: T, /
+        self, parameter: Parameter, context: C, value: Union[Any, MissingType], /
     ) -> Any:
-        resolver: Optional[Resolver[T]] = self.get_resolver(type(parameter.spec))
+        resolver: Optional[Resolver[C]] = self.get_resolver(type(parameter.spec))
 
         if resolver is not None:
-            return resolver(parameter, value)
+            return resolver(parameter, context, value)
         else:
             raise ResolutionError(f"No resolver for parameter {parameter}")
 
 
 def resolve_param(
-    parameter: Parameter[Param], value: Union[Any, MissingType], /
+    parameter: Parameter[Param], context: None, value: Union[Any, MissingType], /
 ) -> Any:
     if value is not Missing:
         return value

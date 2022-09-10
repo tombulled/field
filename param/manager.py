@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 import inspect
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Generic, Union, TypeVar
@@ -9,7 +10,7 @@ from .parameters import Param, ParameterSpecification
 from .resolvers import Resolvers, resolve_param
 from .sentinels import Missing, MissingType
 
-T = TypeVar("T")
+C = TypeVar("C")
 
 
 def _parse(value: Any, /) -> Any:
@@ -32,9 +33,8 @@ def _bind_arguments(func: Callable[..., Any], arguments: Arguments) -> BoundArgu
     return BoundArguments(args=bound_args, kwargs=bound_kwargs)
 
 
-@dataclass
-class ParameterManager(Generic[T]):
-    resolvers: Resolvers[T]
+class ParameterManager(Generic[C], ABC):
+    resolvers: Resolvers[C]
 
     def get_params(self, func: Callable, /) -> Dict[str, Parameter]:
         params: Dict[str, Parameter] = {}
@@ -64,13 +64,17 @@ class ParameterManager(Generic[T]):
     ) -> ParameterSpecification:
         raise MissingSpecification(f"Missing specification for parameter {parameter}")
 
-    def resolve(self, parameter: Parameter, argument: Any) -> Any:
-        return self.resolvers.resolve(parameter, argument)
+    def resolve(self, parameter: Parameter, context: C, argument: Any) -> Any:
+        return self.resolvers.resolve(parameter, context, argument)
 
-    def resolve_parameters(self, parameters: Dict[str, Parameter], arguments: Dict[str, Any], /) -> Dict[str, Any]:
+    @abstractmethod
+    def build_contexts(self, parameters: Dict[str, Parameter], arguments: Dict[str, Any]) -> Dict[str, C]:
+        ...
+
+    def resolve_parameters(self, parameters: Dict[str, Parameter], contexts: Dict[str, C], arguments: Dict[str, Any], /) -> Dict[str, Any]:
         return {
-            parameter.name: self.resolve(parameter, argument)
-            for parameter, argument in zip(parameters.values(), arguments.values())
+            parameter.name: self.resolve(parameter, context, argument if argument is not parameter.spec else Missing)
+            for parameter, context, argument in zip(parameters.values(), contexts.values(), arguments.values())
         }
 
     def get_arguments(self, func: Callable, arguments: Arguments) -> BoundArguments:
@@ -78,7 +82,7 @@ class ParameterManager(Generic[T]):
 
         parameters: Dict[str, Parameter] = self.get_params(func)
 
-        parameters_to_resolve: Dict[str, Parameter] = {}
+        resolution_parameters: Dict[str, Parameter] = {}
 
         source: Dict[str, Any]
         for source in (bound_arguments.args, bound_arguments.kwargs):
@@ -93,9 +97,16 @@ class ParameterManager(Generic[T]):
 
                     # source[parameter_name] = self.resolve(parameter, argument)
 
-                    parameters_to_resolve[parameter_name] = parameter
+                    resolution_parameters[parameter_name] = parameter
 
-        resolved_arguments: Dict[str, Any] = self.resolve_parameters(parameters_to_resolve, bound_arguments.arguments)
+        resolution_arguments: Dict[str, Any] = {
+            parameter: bound_arguments.arguments[parameter]
+            for parameter in resolution_parameters
+        }
+
+        resolution_contexts: Dict[str, C] = self.build_contexts(resolution_parameters, resolution_arguments)
+
+        resolved_arguments: Dict[str, Any] = self.resolve_parameters(resolution_parameters, resolution_contexts, resolution_arguments)
 
         for parameter_name, argument in resolved_arguments.items():
             source = bound_arguments.args if parameter_name in bound_arguments.args else bound_arguments.kwargs
@@ -106,8 +117,8 @@ class ParameterManager(Generic[T]):
 
 
 @dataclass
-class ParamManager(ParameterManager[Union[Any, MissingType]]):
-    resolvers: Resolvers[Union[Any, MissingType]] = field(
+class ParamManager(ParameterManager[None]):
+    resolvers: Resolvers[None] = field(
         default_factory=lambda: Resolvers({Param: resolve_param})
     )
 
@@ -115,3 +126,9 @@ class ParamManager(ParameterManager[Union[Any, MissingType]]):
         self, parameter: inspect.Parameter, /
     ) -> ParameterSpecification:
         return Param(default=_parse(parameter.default))
+
+    def build_contexts(self, parameters: Dict[str, Parameter], arguments: Dict[str, Any]) -> Dict[str, None]:
+        return {
+            parameter: None
+            for parameter in parameters
+        }
