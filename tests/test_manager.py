@@ -54,7 +54,7 @@ def test_get_bound_arguments() -> None:
     def func(a: int, b: str = "b", c: bool = Param(default=True)) -> None:
         ...
 
-    assert manager._get_bound_arguments(func, Arguments(args=(123,))) == BoundArguments(
+    assert manager._bind_arguments(func, Arguments(args=(123,))) == BoundArguments(
         args={"a": 123, "b": "b", "c": Param(default=True)},
         kwargs={},
     )

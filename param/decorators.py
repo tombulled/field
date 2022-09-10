@@ -3,14 +3,13 @@ from typing import Callable, TypeVar
 
 from typing_extensions import ParamSpec
 
-from .manager import ParameterManager
+from .manager import ParamManager
 from .models import Arguments, BoundArguments
-from .resolvers import resolvers
 
 PS = ParamSpec("PS")
 RT = TypeVar("RT")
 
-MANAGER: ParameterManager = ParameterManager(resolvers=resolvers)
+MANAGER: ParamManager = ParamManager()
 
 
 def params(func: Callable[PS, RT], /) -> Callable[PS, RT]:

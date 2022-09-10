@@ -4,7 +4,7 @@ from typing import Any, Dict, Union
 from param.parameters import Param
 from param.sentinels import Missing, MissingType
 from param.decorators import MANAGER
-from param.resolvers import resolvers
+from param.resolvers import Resolvers
 from param.models import Parameter, Arguments
 from param.errors import ResolutionError
 
@@ -34,7 +34,7 @@ def Query(default: Union[str, MissingType] = Missing) -> Any:
     return QueryParam(default=default)
 
 
-@resolvers(QueryParam)
+@MANAGER.resolvers(QueryParam)
 def resolve_query(
     parameter: Parameter[QueryParam], value: Union[Any, MissingType] = Missing, /
 ) -> Any:

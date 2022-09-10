@@ -1,11 +1,12 @@
+from abc import ABC, abstractmethod
 import inspect
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Callable, Dict
 
 from .enums import ParameterType
 from .models import Arguments, BoundArguments, Parameter
 from .parameters import Param, ParameterSpecification
-from .resolvers import Resolvers
+from .resolvers import Resolvers, resolve_param
 from .sentinels import Missing
 
 
@@ -16,9 +17,7 @@ def _parse(value: Any, /) -> Any:
     return value
 
 
-def _get_bound_arguments(
-    func: Callable[..., Any], arguments: Arguments
-) -> BoundArguments:
+def _bind_arguments(func: Callable[..., Any], arguments: Arguments) -> BoundArguments:
     signature: inspect.Signature = inspect.signature(func)
 
     bound_arguments: inspect.BoundArguments = arguments.call(signature.bind)
@@ -32,7 +31,7 @@ def _get_bound_arguments(
 
 
 @dataclass
-class ParameterManager:
+class ParameterManager(ABC):
     resolvers: Resolvers
 
     def get_params(self, func: Callable, /) -> Dict[str, Parameter]:
@@ -58,13 +57,14 @@ class ParameterManager:
 
         return params
 
+    @abstractmethod
     def infer_parameter(
         self, parameter: inspect.Parameter, /
     ) -> ParameterSpecification:
-        return Param(default=_parse(parameter.default))
+        raise NotImplementedError
 
     def get_arguments(self, func: Callable, arguments: Arguments) -> BoundArguments:
-        bound_arguments: BoundArguments = _get_bound_arguments(func, arguments)
+        bound_arguments: BoundArguments = _bind_arguments(func, arguments)
 
         parameters: Dict[str, Parameter] = self.get_params(func)
 
@@ -84,3 +84,15 @@ class ParameterManager:
                     source[parameter_name] = argument
 
         return bound_arguments
+
+
+@dataclass
+class ParamManager(ParameterManager):
+    resolvers: Resolvers = field(
+        default_factory=lambda: Resolvers({Param: resolve_param})
+    )
+
+    def infer_parameter(
+        self, parameter: inspect.Parameter, /
+    ) -> ParameterSpecification:
+        return Param(default=_parse(parameter.default))

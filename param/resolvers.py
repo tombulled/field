@@ -38,10 +38,6 @@ class Resolvers(Register[Type[ParameterSpecification], Resolver]):
             raise ResolutionError(f"No resolver for parameter {parameter}")
 
 
-resolvers: Resolvers = Resolvers()
-
-
-@resolvers(Param)
 def resolve_param(
     parameter: Parameter[Param], value: Union[Any, MissingType] = Missing, /
 ) -> Any:
