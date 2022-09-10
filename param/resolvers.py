@@ -8,6 +8,7 @@ from .parameters import Param, ParameterSpecification
 from .sentinels import Missing, MissingType
 
 
+# NOTE: Change signature to (manager: ParameterManager, parameters: Sequence[Parameter], arguments: Dict[str, Any])
 class Resolver(Protocol):
     def __call__(
         self, parameter: Parameter, value: Union[Any, MissingType] = Missing, /
@@ -21,6 +22,7 @@ class Resolvers(Register[Type[ParameterSpecification], Resolver]):
     ) -> Optional[Resolver]:
         resolver_cls: Type[ParameterSpecification]
         resolver: Resolver
+    # TODO: Implement the below method
         for resolver_cls, resolver in self.items():
             if parameter_cls is resolver_cls:
                 return resolver

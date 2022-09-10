@@ -1,9 +1,9 @@
-from abc import ABC, abstractmethod
 import inspect
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict
 
 from .enums import ParameterType
+from .errors import MissingSpecification
 from .models import Arguments, BoundArguments, Parameter
 from .parameters import Param, ParameterSpecification
 from .resolvers import Resolvers, resolve_param
@@ -30,7 +30,8 @@ def _bind_arguments(func: Callable[..., Any], arguments: Arguments) -> BoundArgu
     return BoundArguments(args=bound_args, kwargs=bound_kwargs)
 
 
-class ParameterManager(ABC):
+@dataclass
+class ParameterManager:
     resolvers: Resolvers
 
     def get_params(self, func: Callable, /) -> Dict[str, Parameter]:
@@ -56,16 +57,26 @@ class ParameterManager(ABC):
 
         return params
 
-    @abstractmethod
     def infer_parameter(
         self, parameter: inspect.Parameter, /
     ) -> ParameterSpecification:
-        raise NotImplementedError
+        raise MissingSpecification(f"Missing specification for parameter {parameter}")
+
+    def resolve(self, parameter: Parameter, argument: Any) -> Any:
+        return self.resolvers.resolve(parameter, argument)
+
+    def resolve_parameters(self, parameters: Dict[str, Parameter], arguments: Dict[str, Any], /) -> Dict[str, Any]:
+        return {
+            parameter.name: self.resolve(parameter, argument)
+            for parameter, argument in zip(parameters.values(), arguments.values())
+        }
 
     def get_arguments(self, func: Callable, arguments: Arguments) -> BoundArguments:
         bound_arguments: BoundArguments = _bind_arguments(func, arguments)
 
         parameters: Dict[str, Parameter] = self.get_params(func)
+
+        parameters_to_resolve: Dict[str, Parameter] = {}
 
         source: Dict[str, Any]
         for source in (bound_arguments.args, bound_arguments.kwargs):
@@ -75,12 +86,19 @@ class ParameterManager(ABC):
                 parameter: Parameter = parameters[parameter_name]
 
                 if isinstance(argument, ParameterSpecification):
-                    if argument is parameter.spec:
-                        argument = Missing
+                    # if argument is parameter.spec:
+                    #     argument = Missing
 
-                    source[parameter_name] = self.resolvers.resolve(parameter, argument)
-                else:
-                    source[parameter_name] = argument
+                    # source[parameter_name] = self.resolve(parameter, argument)
+
+                    parameters_to_resolve[parameter_name] = parameter
+
+        resolved_arguments: Dict[str, Any] = self.resolve_parameters(parameters_to_resolve, bound_arguments.arguments)
+
+        for parameter_name, argument in resolved_arguments.items():
+            source = bound_arguments.args if parameter_name in bound_arguments.args else bound_arguments.kwargs
+
+            source[parameter_name] = argument
 
         return bound_arguments
 

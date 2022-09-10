@@ -26,6 +26,10 @@ class BoundArguments:
     def call(self, func: Callable[..., T], /) -> T:
         return func(*self.args.values(), **self.kwargs)
 
+    @property
+    def arguments(self) -> Dict[str, Any]:
+        return {**self.args, **self.kwargs}
+
 
 @dataclass(frozen=True)
 class Parameter(Generic[PT]):
