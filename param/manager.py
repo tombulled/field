@@ -8,7 +8,7 @@ from .errors import MissingSpecification
 from .models import Arguments, BoundArguments, Parameter
 from .parameters import Param, ParameterSpecification
 from .resolvers import Resolvers, resolve_param
-from .sentinels import Missing, MissingType
+from .sentinels import Missing
 
 C = TypeVar("C")
 
@@ -106,10 +106,11 @@ class ParameterManager(Generic[C], ABC):
             parameter_name: str
             argument: Any
             for parameter_name, argument in source.items():
-                parameter: Parameter = parameters[parameter_name]
+                if parameter_name not in parameters:
+                    continue
 
-                if isinstance(argument, ParameterSpecification):
-                    resolution_parameters[parameter_name] = parameter
+                resolution_parameters[parameter_name] = parameters[parameter_name]
+
 
         resolution_arguments: Dict[str, Any] = {
             parameter: bound_arguments.arguments[parameter]
