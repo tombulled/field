@@ -46,9 +46,9 @@ def test_get_arguments() -> None:
     def func(a: int, b: str = "b", c: bool = Param(default=True)) -> None:
         ...
 
-    assert get_arguments(
-        func, Arguments(args=(123,))
-    ) == BoundArguments(args={"a": 123, "b": "b", "c": True}, kwargs={})
+    assert get_arguments(func, Arguments(args=(123,))) == BoundArguments(
+        args={"a": 123, "b": "b", "c": True}, kwargs={}
+    )
 
 
 def test_get_bound_arguments() -> None:
