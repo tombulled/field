@@ -111,7 +111,6 @@ class ParameterManager(Generic[C], ABC):
 
                 resolution_parameters[parameter_name] = parameters[parameter_name]
 
-
         resolution_arguments: Dict[str, Any] = {
             parameter: bound_arguments.arguments[parameter]
             for parameter in resolution_parameters
