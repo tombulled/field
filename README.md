@@ -2,7 +2,7 @@
 Enhanced function parameters
 
 ## Installation
-```sh
+```console
 pip install git+https://github.com/tombulled/param.git@main
 ```
 
