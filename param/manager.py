@@ -1,19 +1,19 @@
-from abc import ABC, abstractmethod
 import inspect
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Generic, TypeVar
+from typing import Any, Callable, Dict, Generic, Optional, Type, TypeVar, Union
 
 from .enums import ParameterType
-from .errors import MissingSpecification
+from .errors import MissingSpecification, ResolutionError
 from .models import Arguments, BoundArguments, Parameter
 from .parameters import Param, ParameterSpecification
-from .resolvers import Resolvers, resolve_param
-from .sentinels import Missing
+from .resolvers import RESOLVERS, Resolver, Resolvers
+from .sentinels import Missing, MissingType
 
-C = TypeVar("C")
+R = TypeVar("R", bound=Callable)
 
 
-def _parse(value: Any, /) -> Any:
+def _parse(value: Any, /) -> Union[Any, MissingType]:
     if value is inspect._empty:
         return Missing
 
@@ -33,8 +33,8 @@ def _bind_arguments(func: Callable[..., Any], arguments: Arguments) -> BoundArgu
     return BoundArguments(args=bound_args, kwargs=bound_kwargs)
 
 
-class ParameterManager(Generic[C], ABC):
-    resolvers: Resolvers[C]
+class ParameterManager(Generic[R], ABC):
+    resolvers: Resolvers[R]
     infer: bool = True
 
     def get_params(self, func: Callable, /) -> Dict[str, Parameter]:
@@ -67,31 +67,30 @@ class ParameterManager(Generic[C], ABC):
     ) -> ParameterSpecification:
         raise MissingSpecification(f"Missing specification for parameter {parameter}")
 
-    def resolve(self, parameter: Parameter, context: C, argument: Any) -> Any:
-        return self.resolvers.resolve(parameter, context, argument)
+    def get_resolver(self, param_cls: Type[ParameterSpecification], /) -> R:
+        resolver: Optional[R] = self.resolvers.get(param_cls)
+
+        if resolver is not None:
+            return resolver
+        else:
+            raise ResolutionError(f"No resolver for parameter {param_cls}")
 
     @abstractmethod
-    def build_contexts(
-        self, parameters: Dict[str, Parameter], arguments: Dict[str, Any]
-    ) -> Dict[str, C]:
-        ...
+    def resolve(self, parameter: Parameter, argument: Union[Any, MissingType]) -> Any:
+        raise NotImplementedError
 
     def resolve_parameters(
         self,
         parameters: Dict[str, Parameter],
-        contexts: Dict[str, C],
         arguments: Dict[str, Any],
         /,
     ) -> Dict[str, Any]:
         return {
             parameter.name: self.resolve(
                 parameter,
-                context,
                 argument if argument is not parameter.spec else Missing,
             )
-            for parameter, context, argument in zip(
-                parameters.values(), contexts.values(), arguments.values()
-            )
+            for parameter, argument in zip(parameters.values(), arguments.values())
         }
 
     def get_arguments(self, func: Callable, arguments: Arguments) -> BoundArguments:
@@ -116,12 +115,8 @@ class ParameterManager(Generic[C], ABC):
             for parameter in resolution_parameters
         }
 
-        resolution_contexts: Dict[str, C] = self.build_contexts(
-            resolution_parameters, resolution_arguments
-        )
-
         resolved_arguments: Dict[str, Any] = self.resolve_parameters(
-            resolution_parameters, resolution_contexts, resolution_arguments
+            resolution_parameters, resolution_arguments
         )
 
         for parameter_name, argument in resolved_arguments.items():
@@ -137,17 +132,13 @@ class ParameterManager(Generic[C], ABC):
 
 
 @dataclass
-class ParamManager(ParameterManager[None]):
-    resolvers: Resolvers[None] = field(
-        default_factory=lambda: Resolvers({Param: resolve_param})
-    )
+class ParamManager(ParameterManager[Resolver]):
+    resolvers: Resolvers[Resolver] = field(default_factory=lambda: RESOLVERS)
 
     def infer_parameter(
         self, parameter: inspect.Parameter, /
     ) -> ParameterSpecification:
         return Param(default=_parse(parameter.default))
 
-    def build_contexts(
-        self, parameters: Dict[str, Parameter], arguments: Dict[str, Any]
-    ) -> Dict[str, None]:
-        return {parameter: None for parameter in parameters}
+    def resolve(self, parameter: Parameter, argument: Union[Any, MissingType]) -> Any:
+        return self.get_resolver(type(parameter.spec))(parameter, argument)
