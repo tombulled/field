@@ -9,7 +9,7 @@ from param.wrappers import Param
 
 
 def test_parse_empty() -> None:
-    assert manager._parse(inspect._empty) is Missing
+    assert manager._parse(inspect.Parameter.empty) is Missing
 
 
 def test_parse_not_empty() -> None:
@@ -23,21 +23,21 @@ def test_get_params() -> None:
     assert get_params(func) == {
         "a": Parameter(
             name="a",
+            default=parameters.Param(),
             annotation=int,
             type=ParameterType.POSITIONAL_OR_KEYWORD,
-            spec=parameters.Param(),
         ),
         "b": Parameter(
             name="b",
+            default=parameters.Param(default="b"),
             annotation=str,
             type=ParameterType.POSITIONAL_OR_KEYWORD,
-            spec=parameters.Param(default="b"),
         ),
         "c": Parameter(
             name="c",
+            default=parameters.Param(),
             annotation=bool,
             type=ParameterType.VAR_KEYWORD,
-            spec=parameters.Param(),
         ),
     }
 

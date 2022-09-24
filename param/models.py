@@ -2,11 +2,9 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Generic, Tuple, TypeVar, Union
 
 from .enums import ParameterType
-from .parameters import ParameterSpecification
 from .sentinels import Missing, MissingType
 
 T = TypeVar("T")
-PT = TypeVar("PT", bound=ParameterSpecification)
 
 
 @dataclass(frozen=True)
@@ -32,8 +30,8 @@ class BoundArguments:
 
 
 @dataclass(frozen=True)
-class Parameter(Generic[PT]):
+class Parameter(Generic[T]):
     name: str
-    spec: PT
-    type: ParameterType = ParameterType.POSITIONAL_OR_KEYWORD
+    default: T
     annotation: Union[Any, MissingType] = Missing
+    type: ParameterType = ParameterType.POSITIONAL_OR_KEYWORD

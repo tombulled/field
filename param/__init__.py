@@ -7,3 +7,4 @@ from .models import Arguments, BoundArguments, Parameter
 from .parameters import ParameterSpecification
 from .sentinels import Missing
 from .wrappers import Param
+from .resolvers import Resolvers, Resolver

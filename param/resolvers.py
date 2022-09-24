@@ -28,7 +28,7 @@ def resolve_param(
 ) -> Any:
     if value is not Missing:
         return value
-    if parameter.spec.has_default():
-        return parameter.spec.get_default()
+    if parameter.default.has_default():
+        return parameter.default.get_default()
     else:
         raise ResolutionError("No value provided and parameter has no default")
