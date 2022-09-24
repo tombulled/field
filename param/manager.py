@@ -73,7 +73,11 @@ class ParameterManager(Generic[R]):
         else:
             raise ResolutionError(f"No resolver for parameter {param_cls}")
 
-    def resolve(self, parameter: Parameter[ParameterSpecification], argument: Union[Any, MissingType]) -> Any:
+    def resolve(
+        self,
+        parameter: Parameter[ParameterSpecification],
+        argument: Union[Any, MissingType],
+    ) -> Any:
         raise ResolutionError("Resolution method not implemented")
 
     def resolve_parameters(
@@ -146,5 +150,9 @@ class ParamManager(ParameterManager[Resolver]):
     def infer_spec(self, parameter: inspect.Parameter, /) -> ParameterSpecification:
         return Param(default=_parse(parameter.default))
 
-    def resolve(self, parameter: Parameter[ParameterSpecification], argument: Union[Any, MissingType]) -> Any:
+    def resolve(
+        self,
+        parameter: Parameter[ParameterSpecification],
+        argument: Union[Any, MissingType],
+    ) -> Any:
         return self.get_resolver(type(parameter.default))(parameter, argument)
