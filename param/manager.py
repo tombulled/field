@@ -19,7 +19,7 @@ def _parse(value: Any, /) -> Union[Any, MissingType]:
     return value
 
 
-def _bind_arguments(func: Callable[..., Any], arguments: Arguments) -> BoundArguments:
+def _bind_arguments(func: Callable, arguments: Arguments) -> BoundArguments:
     signature: inspect.Signature = inspect.signature(func)
 
     bound_arguments: inspect.BoundArguments = arguments.call(signature.bind)
@@ -50,14 +50,12 @@ class ParameterManager(Generic[R]):
                 if inferred_spec is not None:
                     default = inferred_spec
 
-            param: Parameter = Parameter(
+            params[parameter.name] = Parameter(
                 name=parameter.name,
                 default=default,
                 annotation=_parse(parameter.annotation),
                 type=ParameterType.from_kind(parameter.kind),
             )
-
-            params[parameter.name] = param
 
         return params
 
@@ -74,7 +72,7 @@ class ParameterManager(Generic[R]):
         else:
             raise ResolutionError(f"No resolver for parameter {param_cls}")
 
-    def resolve(self, parameter: Parameter, argument: Union[Any, MissingType]) -> Any:
+    def resolve(self, parameter: Parameter[ParameterSpecification], argument: Union[Any, MissingType]) -> Any:
         raise ResolutionError("Resolution method not implemented")
 
     def resolve_parameters(
@@ -147,6 +145,5 @@ class ParamManager(ParameterManager[Resolver]):
     def infer_spec(self, parameter: inspect.Parameter, /) -> ParameterSpecification:
         return Param(default=_parse(parameter.default))
 
-    def resolve(self, parameter: Parameter, argument: Union[Any, MissingType]) -> Any:
-        if isinstance(parameter.default, ParameterSpecification):
-            return self.get_resolver(type(parameter.default))(parameter, argument)
+    def resolve(self, parameter: Parameter[ParameterSpecification], argument: Union[Any, MissingType]) -> Any:
+        return self.get_resolver(type(parameter.default))(parameter, argument)
