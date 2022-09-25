@@ -80,55 +80,45 @@ class ParameterManager(Generic[R]):
     ) -> Any:
         raise ResolutionError("Resolution method not implemented")
 
-    def resolve_parameters(
+    def resolve_arguments(
         self,
-        parameters: Dict[str, Parameter],
-        arguments: Dict[str, Any],
+        arguments: Dict[Parameter[ParameterSpecification], Union[Any, MissingType]],
         /,
     ) -> Dict[str, Any]:
-        resolved_parameters: Dict[str, Any] = {}
-
-        parameter: Parameter
-        argument: Any
-        for parameter, argument in zip(parameters.values(), arguments.values()):
-            if (
-                isinstance(argument, ParameterSpecification)
-                and isinstance(parameter.default, ParameterSpecification)
-                and argument is parameter.default
-            ):
-                argument = Missing
-
-            if isinstance(parameter.default, ParameterSpecification):
-                resolved_parameters[parameter.name] = self.resolve(parameter, argument)
-            else:
-                resolved_parameters[parameter.name] = argument
-
-        return resolved_parameters
+        return {
+            parameter.name: self.resolve(parameter, argument)
+            for parameter, argument in arguments.items()
+        }
 
     def get_arguments(self, func: Callable, arguments: Arguments) -> BoundArguments:
         bound_arguments: BoundArguments = _bind_arguments(func, arguments)
 
         parameters: Dict[str, Parameter] = self.get_params(func)
 
-        resolution_parameters: Dict[str, Parameter] = {}
+        resolution_arguments: Dict[
+            Parameter[ParameterSpecification], Union[Any, MissingType]
+        ] = {}
 
         source: Dict[str, Any]
         for source in (bound_arguments.args, bound_arguments.kwargs):
             parameter_name: str
             argument: Any
             for parameter_name, argument in source.items():
-                if parameter_name not in parameters:
+                parameter: Parameter = parameters[parameter_name]
+
+                if not isinstance(parameter.default, ParameterSpecification):
                     continue
 
-                resolution_parameters[parameter_name] = parameters[parameter_name]
+                if (
+                    isinstance(argument, ParameterSpecification)
+                    and argument is parameter.default
+                ):
+                    argument = Missing
 
-        resolution_arguments: Dict[str, Any] = {
-            parameter: bound_arguments.arguments[parameter]
-            for parameter in resolution_parameters
-        }
+                resolution_arguments[parameter] = argument
 
-        resolved_arguments: Dict[str, Any] = self.resolve_parameters(
-            resolution_parameters, resolution_arguments
+        resolved_arguments: Dict[str, Any] = self.resolve_arguments(
+            resolution_arguments
         )
 
         for parameter_name, argument in resolved_arguments.items():
