@@ -85,14 +85,10 @@ class ParameterManager(Generic[R]):
         arguments: Dict[Parameter[ParameterSpecification], Union[Any, MissingType]],
         /,
     ) -> Dict[str, Any]:
-        resolved_arguments: Dict[str, Any] = {}
-
-        parameter: Parameter
-        argument: Any
-        for parameter, argument in arguments.items():
-            resolved_arguments[parameter.name] = self.resolve(parameter, argument)
-
-        return resolved_arguments
+        return {
+            parameter.name: self.resolve(parameter, argument)
+            for parameter, argument in arguments.items()
+        }
 
     def get_arguments(self, func: Callable, arguments: Arguments) -> BoundArguments:
         bound_arguments: BoundArguments = _bind_arguments(func, arguments)
@@ -112,7 +108,7 @@ class ParameterManager(Generic[R]):
 
                 if not isinstance(parameter.default, ParameterSpecification):
                     continue
-                
+
                 if (
                     isinstance(argument, ParameterSpecification)
                     and argument is parameter.default
