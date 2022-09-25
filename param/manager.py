@@ -110,14 +110,16 @@ class ParameterManager(Generic[R]):
             for parameter_name, argument in source.items():
                 parameter: Parameter = parameters[parameter_name]
 
-                if isinstance(parameter.default, ParameterSpecification):
-                    if (
-                        isinstance(argument, ParameterSpecification)
-                        and argument is parameter.default
-                    ):
-                        argument = Missing
+                if not isinstance(parameter.default, ParameterSpecification):
+                    continue
+                
+                if (
+                    isinstance(argument, ParameterSpecification)
+                    and argument is parameter.default
+                ):
+                    argument = Missing
 
-                    resolution_arguments[parameter] = argument
+                resolution_arguments[parameter] = argument
 
         resolved_arguments: Dict[str, Any] = self.resolve_arguments(
             resolution_arguments
