@@ -8,15 +8,9 @@ from .models import Arguments, BoundArguments, Parameter
 from .parameters import Param, ParameterSpecification
 from .resolvers import RESOLVERS, Resolver, Resolvers
 from .sentinels import Missing, MissingType
+from .utils import parse
 
 R = TypeVar("R", bound=Callable)
-
-
-def _parse(value: Any, /) -> Union[Any, MissingType]:
-    if value is inspect.Parameter.empty:
-        return Missing
-
-    return value
 
 
 def _bind_arguments(func: Callable, arguments: Arguments) -> BoundArguments:
@@ -41,7 +35,7 @@ class ParameterManager(Generic[R]):
 
         parameter: inspect.Parameter
         for parameter in inspect.signature(func).parameters.values():
-            default: Union[Any, MissingType] = _parse(parameter.default)
+            default: Union[Any, MissingType] = parse(parameter.default)
 
             if not isinstance(default, ParameterSpecification):
                 inferred_spec: Optional[ParameterSpecification] = self.infer_spec(
@@ -54,7 +48,7 @@ class ParameterManager(Generic[R]):
             params[parameter.name] = Parameter(
                 name=parameter.name,
                 default=default,
-                annotation=_parse(parameter.annotation),
+                annotation=parse(parameter.annotation),
                 type=ParameterType.from_kind(parameter.kind),
             )
 
@@ -138,7 +132,7 @@ class ParamManager(ParameterManager[Resolver]):
     resolvers: Resolvers[Resolver] = field(default_factory=lambda: RESOLVERS)
 
     def infer_spec(self, parameter: inspect.Parameter, /) -> ParameterSpecification:
-        return Param(default=_parse(parameter.default))
+        return Param(default=parse(parameter.default))
 
     def resolve(
         self,

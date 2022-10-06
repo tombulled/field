@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+import inspect
 from typing import Any, Callable, Dict, Generic, Tuple, TypeVar, Union
 
 from .enums import ParameterType
@@ -35,3 +36,16 @@ class Parameter(Generic[T]):
     default: T
     annotation: Union[Any, MissingType] = Missing
     type: ParameterType = ParameterType.POSITIONAL_OR_KEYWORD
+
+    @classmethod
+    def from_parameter(cls, parameter: inspect.Parameter, /) -> "Parameter":
+        return cls(
+            name=parameter.name,
+            default=parameter.default,
+            annotation=(
+                parameter.annotation
+                if parameter.annotation is not inspect.Parameter.empty
+                else Missing
+            ),
+            type=ParameterType.from_kind(parameter.kind),
+        )
