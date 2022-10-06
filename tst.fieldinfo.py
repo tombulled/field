@@ -23,7 +23,8 @@ mf = ModelField(
     alias=None,
 )
 
-v, errors = mf.validate("this is too long", {}, loc=("query", "name"))
+# v, errors = mf.validate("this is too long", {}, loc=("query", "name"))
+v, errors = mf.validate(123, {}, loc=("query", "name"))
 
 if errors:
     raise ValidationError([errors], MyModel)
