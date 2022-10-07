@@ -1,5 +1,4 @@
 from param import Param, params
-from abc import ABC
 
 
 @params
@@ -7,25 +6,25 @@ def get(url: str, params: dict = Param(default_factory=dict)):
     print("GET", url, params)
 
 
-class MyClass(ABC):
+class MyClass:
     @params
-    def get1(self, url: str, params: dict = Param(default_factory=dict)):
+    def get(self, url: str, params: dict = Param(default_factory=dict)):
         print("GET", url, params)
 
     @classmethod
     @params
-    def get2(cls, url: str, params: dict = Param(default_factory=dict)):
-        print("GET", url, params)
+    def post(cls, url: str, params: dict = Param(default_factory=dict)):
+        print("POST", url, params)
 
     @staticmethod
     @params
-    def get3(url: str, params: dict = Param(default_factory=dict)):
-        print("GET", url, params)
+    def put(url: str, params: dict = Param(default_factory=dict)):
+        print("PUT", url, params)
 
 
 get("https://httpbin.com/get")
-MyClass().get1("https://httpbin.com/get")
-MyClass().get2("https://httpbin.com/get")
-MyClass.get2("https://httpbin.com/get")
-MyClass().get3("https://httpbin.com/get")
-MyClass.get3("https://httpbin.com/get")
+MyClass().get("https://httpbin.com/get")
+MyClass().post("https://httpbin.com/get")
+MyClass.post("https://httpbin.com/get")
+MyClass().put("https://httpbin.com/get")
+MyClass.put("https://httpbin.com/get")
