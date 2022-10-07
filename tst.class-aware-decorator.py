@@ -1,14 +1,13 @@
 from pprint import pprint
 
+
 def decorate(func):
     print("decorate", func)
     print(dir(func))
-    pprint({
-        k: getattr(func, k)
-        for k in dir(func)
-    })
+    pprint({k: getattr(func, k) for k in dir(func)})
 
     return func
+
 
 class MyClass:
     @decorate
@@ -16,8 +15,6 @@ class MyClass:
     def foo(name):
         return name
 
-@staticmethod
-def tst(): pass
 
 class TestClass:
     def method(self, name):
@@ -30,5 +27,6 @@ class TestClass:
     @staticmethod
     def static_method(self, name):
         return name
+
 
 tc = TestClass()

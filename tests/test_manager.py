@@ -1,19 +1,8 @@
-import inspect
-
 from param import manager, parameters
 from param.api import get_arguments, get_params
 from param.enums import ParameterType
 from param.models import Arguments, BoundArguments, Parameter
-from param.sentinels import Missing
 from param.wrappers import Param
-
-
-def test_parse_empty() -> None:
-    assert manager._parse(inspect.Parameter.empty) is Missing
-
-
-def test_parse_not_empty() -> None:
-    assert manager._parse(123) == 123
 
 
 def test_get_params() -> None:
