@@ -16,8 +16,8 @@ class MyClass:
     def foo(name):
         return name
 
-# @staticmethod
-# def tst(): pass
+@staticmethod
+def tst(): pass
 
 class TestClass:
     def method(self, name):
