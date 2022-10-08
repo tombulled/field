@@ -1,15 +1,15 @@
 import functools
 import inspect
 from dataclasses import dataclass, field
+from pydantic.fields import Undefined
 from typing import Any, Callable, Dict, Generic, Iterable, Optional, Type, TypeVar
 
 from typing_extensions import ParamSpec
 
 from .errors import ResolutionError
 from .models import Arguments, BoundArguments, Parameter, Resolvable
-from .parameters import Param, ParameterSpecification
+from .parameters import Param
 from .resolvers import RESOLVERS, Resolver, Resolvers
-from .sentinels import Missing
 
 PS = ParamSpec("PS")
 RT = TypeVar("RT")
@@ -41,15 +41,13 @@ class ParameterManager(Generic[R]):
             for parameter in inspect.signature(func).parameters.values()
         }
 
-    def get_parameter_specification(
-        self, parameter: Parameter, /
-    ) -> Optional[ParameterSpecification]:
-        if isinstance(parameter.default, ParameterSpecification):
+    def get_parameter_specification(self, parameter: Parameter, /) -> Optional[Param]:
+        if isinstance(parameter.default, Param):
             return parameter.default
         else:
             return None
 
-    def get_resolver(self, param_cls: Type[ParameterSpecification], /) -> R:
+    def get_resolver(self, param_cls: Type[Param], /) -> R:
         resolver: Optional[R] = self.resolvers.get(param_cls)
 
         if resolver is not None:
@@ -81,18 +79,16 @@ class ParameterManager(Generic[R]):
         argument: Any
         for parameter_name, argument in bound_arguments.arguments.items():
             parameter: Parameter = parameters[parameter_name]
-            specification: Optional[
-                ParameterSpecification
-            ] = self.get_parameter_specification(parameter)
+            specification: Optional[Param] = self.get_parameter_specification(parameter)
 
             if specification is None:
                 continue
 
             if argument is specification:
-                argument = Missing
+                argument = Undefined
 
             resolvable: Resolvable = Resolvable(
-                parameter=parameter, specification=specification, argument=argument
+                parameter=parameter, field=specification, argument=argument
             )
 
             resolvables[parameter_name] = resolvable
@@ -144,12 +140,8 @@ class ParameterManager(Generic[R]):
 class ParamManager(ParameterManager[Resolver]):
     resolvers: Resolvers[Resolver] = field(default_factory=lambda: RESOLVERS)
 
-    def get_parameter_specification(
-        self, parameter: Parameter, /
-    ) -> ParameterSpecification:
-        specification: Optional[
-            ParameterSpecification
-        ] = super().get_parameter_specification(parameter)
+    def get_parameter_specification(self, parameter: Parameter, /) -> Param:
+        specification: Optional[Param] = super().get_parameter_specification(parameter)
 
         if specification is not None:
             return specification
@@ -160,7 +152,7 @@ class ParamManager(ParameterManager[Resolver]):
         self,
         resolvable: Resolvable,
     ) -> Any:
-        resolver_cls: Type[ParameterSpecification] = type(resolvable.specification)
+        resolver_cls: Type[Param] = type(resolvable.field)
         resolver: Resolver = self.get_resolver(resolver_cls)
 
         return resolver(resolvable)

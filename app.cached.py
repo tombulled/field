@@ -7,7 +7,8 @@ from param.parameters import Param as ParamModel
 from param.parameters import ParameterSpecification
 from param.resolvers import Resolvers
 from param.models import Parameter, Arguments
-from param.manager import ParameterManager, _parse
+from param.manager import ParameterManager
+from param.utils import parse
 from param.sentinels import MissingType, Missing
 from param.errors import ResolutionError
 

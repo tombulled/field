@@ -1,5 +1,5 @@
 from enum import Enum, auto
-from inspect import _ParameterKind
+from inspect import _ParameterKind as ParameterKind
 
 
 class NoValue(Enum):
@@ -15,5 +15,5 @@ class ParameterType(NoValue):
     VAR_KEYWORD = auto()
 
     @classmethod
-    def from_kind(cls, kind: _ParameterKind, /) -> "ParameterType":
+    def from_kind(cls, kind: ParameterKind, /) -> "ParameterType":
         return getattr(cls, kind.name)

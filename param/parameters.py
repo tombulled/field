@@ -1,32 +1,64 @@
-from abc import ABC
-from dataclasses import dataclass
-from typing import Callable, Generic, TypeVar, Union
-
-from .sentinels import Missing, MissingType
-
-T = TypeVar("T")
+from typing import Mapping, Set, Union, Any, Optional
+from pydantic.fields import FieldInfo, Undefined, UndefinedType
+from .typing import Supplier
 
 
-class ParameterSpecification(ABC):
-    pass
-
-
-@dataclass(frozen=True)
-class Param(Generic[T], ParameterSpecification):
-    default: Union[T, MissingType] = Missing
-    default_factory: Union[Callable[[], T], MissingType] = Missing
-
-    def __post_init__(self):
-        if self.default is not Missing and self.default_factory is not Missing:
-            raise ValueError("cannot specify both `default` and `default_factory`")
-
-    def get_default(self) -> Union[T, MissingType]:
-        if self.default_factory is not Missing:
-            return self.default_factory()
-        elif self.default is not Missing:
-            return self.default
-
-        return Missing
-
-    def has_default(self) -> bool:
-        return self.default is not Missing or self.default_factory is not Missing
+class Param(FieldInfo):
+    def __init__(
+        self,
+        default: Union[Any, UndefinedType] = Undefined,
+        *,
+        default_factory: Optional[Supplier[Any]] = None,
+        alias: Optional[str] = None,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        exclude: Union[Set[Union[int, str]], Mapping[Union[int, str], Any], Any] = None,
+        include: Union[Set[Union[int, str]], Mapping[Union[int, str], Any], Any] = None,
+        const: Optional[bool] = None,
+        gt: Optional[float] = None,
+        ge: Optional[float] = None,
+        lt: Optional[float] = None,
+        le: Optional[float] = None,
+        multiple_of: Optional[float] = None,
+        allow_inf_nan: Optional[bool] = None,
+        max_digits: Optional[int] = None,
+        decimal_places: Optional[int] = None,
+        min_items: Optional[int] = None,
+        max_items: Optional[int] = None,
+        unique_items: Optional[bool] = None,
+        min_length: Optional[int] = None,
+        max_length: Optional[int] = None,
+        allow_mutation: bool = True,
+        regex: Optional[str] = None,
+        discriminator: Optional[str] = None,
+        repr: bool = True,
+        **extra: Any,
+    ):
+        super().__init__(
+            default,
+            default_factory=default_factory,
+            alias=alias,
+            title=title,
+            description=description,
+            exclude=exclude,
+            include=include,
+            const=const,
+            gt=gt,
+            ge=ge,
+            lt=lt,
+            le=le,
+            multiple_of=multiple_of,
+            allow_inf_nan=allow_inf_nan,
+            max_digits=max_digits,
+            decimal_places=decimal_places,
+            min_items=min_items,
+            max_items=max_items,
+            unique_items=unique_items,
+            min_length=min_length,
+            max_length=max_length,
+            allow_mutation=allow_mutation,
+            regex=regex,
+            discriminator=discriminator,
+            repr=repr,
+            **extra,
+        )
