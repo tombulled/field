@@ -1,17 +1,17 @@
-from typing import Any, Callable, Protocol, Type, TypeVar, Union
+from typing import Any, Callable, Protocol, Type, TypeVar
 
 from roster import Register
 
 from .errors import ResolutionError
-from .models import Parameter
+from .models import Resolvable
 from .parameters import Param, ParameterSpecification
-from .sentinels import Missing, MissingType
+from .sentinels import Missing
 
 R = TypeVar("R", bound=Callable)
 
 
 class Resolver(Protocol):
-    def __call__(self, parameter: Parameter, value: Union[Any, MissingType], /) -> Any:
+    def __call__(self, resolvable: Resolvable, /) -> Any:
         ...
 
 
@@ -23,12 +23,10 @@ RESOLVERS: Resolvers[Resolver] = Resolvers()
 
 
 @RESOLVERS(Param)
-def resolve_param(
-    parameter: Parameter[Param], value: Union[Any, MissingType], /
-) -> Any:
-    if value is not Missing:
-        return value
-    if parameter.default.has_default():
-        return parameter.default.get_default()
+def resolve_param(resolvable: Resolvable[Param], /) -> Any:
+    if resolvable.argument is not Missing:
+        return resolvable.argument
+    elif resolvable.specification.has_default():
+        return resolvable.specification.get_default()
     else:
         raise ResolutionError("No value provided and parameter has no default")
