@@ -1,22 +1,20 @@
+import functools
 import inspect
 from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Generic, Optional, Type, TypeVar, Union
+from typing import Any, Callable, Dict, Generic, Iterable, Optional, Type, TypeVar
 
-from .enums import ParameterType
+from typing_extensions import ParamSpec
+
 from .errors import ResolutionError
-from .models import Arguments, BoundArguments, Parameter
+from .models import Arguments, BoundArguments, Parameter, Resolvable
 from .parameters import Param, ParameterSpecification
 from .resolvers import RESOLVERS, Resolver, Resolvers
-from .sentinels import Missing, MissingType
+from .sentinels import Missing
+
+PS = ParamSpec("PS")
+RT = TypeVar("RT")
 
 R = TypeVar("R", bound=Callable)
-
-
-def _parse(value: Any, /) -> Union[Any, MissingType]:
-    if value is inspect.Parameter.empty:
-        return Missing
-
-    return value
 
 
 def _bind_arguments(func: Callable, arguments: Arguments) -> BoundArguments:
@@ -36,34 +34,20 @@ def _bind_arguments(func: Callable, arguments: Arguments) -> BoundArguments:
 class ParameterManager(Generic[R]):
     resolvers: Resolvers[R]
 
-    def get_params(self, func: Callable, /) -> Dict[str, Parameter]:
-        params: Dict[str, Parameter] = {}
+    @staticmethod
+    def get_parameters(func: Callable, /) -> Dict[str, Parameter]:
+        return {
+            parameter.name: Parameter.from_parameter(parameter)
+            for parameter in inspect.signature(func).parameters.values()
+        }
 
-        parameter: inspect.Parameter
-        for parameter in inspect.signature(func).parameters.values():
-            default: Union[Any, MissingType] = _parse(parameter.default)
-
-            if not isinstance(default, ParameterSpecification):
-                inferred_spec: Optional[ParameterSpecification] = self.infer_spec(
-                    parameter
-                )
-
-                if inferred_spec is not None:
-                    default = inferred_spec
-
-            params[parameter.name] = Parameter(
-                name=parameter.name,
-                default=default,
-                annotation=_parse(parameter.annotation),
-                type=ParameterType.from_kind(parameter.kind),
-            )
-
-        return params
-
-    def infer_spec(
-        self, parameter: inspect.Parameter, /
+    def get_parameter_specification(
+        self, parameter: Parameter, /
     ) -> Optional[ParameterSpecification]:
-        return None
+        if isinstance(parameter.default, ParameterSpecification):
+            return parameter.default
+        else:
+            return None
 
     def get_resolver(self, param_cls: Type[ParameterSpecification], /) -> R:
         resolver: Optional[R] = self.resolvers.get(param_cls)
@@ -73,86 +57,110 @@ class ParameterManager(Generic[R]):
         else:
             raise ResolutionError(f"No resolver for parameter {param_cls}")
 
-    def resolve(
-        self,
-        parameter: Parameter[ParameterSpecification],
-        argument: Union[Any, MissingType],
-    ) -> Any:
+    def resolve(self, resolvable: Resolvable) -> Any:
         raise ResolutionError("Resolution method not implemented")
 
-    def resolve_parameters(
+    def resolve_all(
         self,
-        parameters: Dict[str, Parameter],
-        arguments: Dict[str, Any],
+        resolvables: Iterable[Resolvable],
         /,
     ) -> Dict[str, Any]:
-        resolved_parameters: Dict[str, Any] = {}
-
-        parameter: Parameter
-        argument: Any
-        for parameter, argument in zip(parameters.values(), arguments.values()):
-            if (
-                isinstance(argument, ParameterSpecification)
-                and isinstance(parameter.default, ParameterSpecification)
-                and argument is parameter.default
-            ):
-                argument = Missing
-
-            if isinstance(parameter.default, ParameterSpecification):
-                resolved_parameters[parameter.name] = self.resolve(parameter, argument)
-            else:
-                resolved_parameters[parameter.name] = argument
-
-        return resolved_parameters
-
-    def get_arguments(self, func: Callable, arguments: Arguments) -> BoundArguments:
-        bound_arguments: BoundArguments = _bind_arguments(func, arguments)
-
-        parameters: Dict[str, Parameter] = self.get_params(func)
-
-        resolution_parameters: Dict[str, Parameter] = {}
-
-        source: Dict[str, Any]
-        for source in (bound_arguments.args, bound_arguments.kwargs):
-            parameter_name: str
-            argument: Any
-            for parameter_name, argument in source.items():
-                if parameter_name not in parameters:
-                    continue
-
-                resolution_parameters[parameter_name] = parameters[parameter_name]
-
-        resolution_arguments: Dict[str, Any] = {
-            parameter: bound_arguments.arguments[parameter]
-            for parameter in resolution_parameters
+        return {
+            resolvable.parameter.name: self.resolve(resolvable)
+            for resolvable in resolvables
         }
 
-        resolved_arguments: Dict[str, Any] = self.resolve_parameters(
-            resolution_parameters, resolution_arguments
-        )
+    def get_resolvables(
+        self, func: Callable, arguments: Arguments, /
+    ) -> Dict[str, Resolvable]:
+        bound_arguments: BoundArguments = _bind_arguments(func, arguments)
+        parameters: Dict[str, Parameter] = self.get_parameters(func)
+        resolvables: Dict[str, Resolvable] = {}
 
-        for parameter_name, argument in resolved_arguments.items():
-            source = (
-                bound_arguments.args
-                if parameter_name in bound_arguments.args
-                else bound_arguments.kwargs
+        parameter_name: str
+        argument: Any
+        for parameter_name, argument in bound_arguments.arguments.items():
+            parameter: Parameter = parameters[parameter_name]
+            specification: Optional[
+                ParameterSpecification
+            ] = self.get_parameter_specification(parameter)
+
+            if specification is None:
+                continue
+
+            if argument is specification:
+                argument = Missing
+
+            resolvable: Resolvable = Resolvable(
+                parameter=parameter, specification=specification, argument=argument
             )
 
-            source[parameter_name] = argument
+            resolvables[parameter_name] = resolvable
 
-        return bound_arguments
+        return resolvables
+
+    def get_arguments(self, func: Callable, arguments: Arguments) -> BoundArguments:
+        resolvables: Dict[str, Resolvable] = self.get_resolvables(func, arguments)
+        parameters: Dict[str, Parameter] = self.get_parameters(func)
+        bound_arguments: BoundArguments = _bind_arguments(func, arguments)
+        resolved_arguments: Dict[str, Any] = self.resolve_all(resolvables.values())
+
+        args: Dict[str, Any] = {}
+        kwargs: Dict[str, Any] = {}
+
+        parameter: Parameter
+        for parameter in parameters.values():
+            destination: Dict[str, Any]
+
+            if parameter.name in bound_arguments.args:
+                destination = args
+            else:
+                destination = kwargs
+
+            argument: Any
+
+            if parameter.name in resolvables:
+                argument = resolved_arguments[parameter.name]
+            else:
+                argument = bound_arguments.arguments[parameter.name]
+
+            destination[parameter.name] = argument
+
+        return BoundArguments(args=args, kwargs=kwargs)
+
+    def params(self, func: Callable[PS, RT], /) -> Callable[PS, RT]:
+        @functools.wraps(func)
+        def wrapper(*args: PS.args, **kwargs: PS.kwargs) -> RT:
+            arguments: Arguments = Arguments(args=args, kwargs=kwargs)
+
+            bound_arguments: BoundArguments = self.get_arguments(func, arguments)
+
+            return bound_arguments.call(func)
+
+        return wrapper
 
 
 @dataclass
 class ParamManager(ParameterManager[Resolver]):
     resolvers: Resolvers[Resolver] = field(default_factory=lambda: RESOLVERS)
 
-    def infer_spec(self, parameter: inspect.Parameter, /) -> ParameterSpecification:
-        return Param(default=_parse(parameter.default))
+    def get_parameter_specification(
+        self, parameter: Parameter, /
+    ) -> ParameterSpecification:
+        specification: Optional[
+            ParameterSpecification
+        ] = super().get_parameter_specification(parameter)
+
+        if specification is not None:
+            return specification
+        else:
+            return Param(default=parameter.default)
 
     def resolve(
         self,
-        parameter: Parameter[ParameterSpecification],
-        argument: Union[Any, MissingType],
+        resolvable: Resolvable,
     ) -> Any:
-        return self.get_resolver(type(parameter.default))(parameter, argument)
+        resolver_cls: Type[ParameterSpecification] = type(resolvable.specification)
+        resolver: Resolver = self.get_resolver(resolver_cls)
+
+        return resolver(resolvable)
