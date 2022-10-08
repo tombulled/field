@@ -1,10 +1,92 @@
-from typing import Any, Callable, TypeVar, overload
+from typing import Any, Mapping, Optional, Set, TypeVar, Union, overload
+
+from .typing import Supplier
 
 T = TypeVar("T")
 
 @overload
-def Param() -> Any: ...
+def Param(
+    *,
+    alias: Optional[str] = None,
+    title: Optional[str] = None,
+    description: Optional[str] = None,
+    exclude: Union[Set[Union[int, str]], Mapping[Union[int, str], Any], Any] = None,
+    include: Union[Set[Union[int, str]], Mapping[Union[int, str], Any], Any] = None,
+    const: Optional[bool] = None,
+    gt: Optional[float] = None,
+    ge: Optional[float] = None,
+    lt: Optional[float] = None,
+    le: Optional[float] = None,
+    multiple_of: Optional[float] = None,
+    allow_inf_nan: Optional[bool] = None,
+    max_digits: Optional[int] = None,
+    decimal_places: Optional[int] = None,
+    min_items: Optional[int] = None,
+    max_items: Optional[int] = None,
+    unique_items: Optional[bool] = None,
+    min_length: Optional[int] = None,
+    max_length: Optional[int] = None,
+    allow_mutation: bool = True,
+    regex: Optional[str] = None,
+    discriminator: Optional[str] = None,
+    repr: bool = True,
+    **extra: Any,
+) -> Any: ...
 @overload
-def Param(*, default: T) -> T: ...
+def Param(
+    default: T,
+    *,
+    alias: Optional[str] = None,
+    title: Optional[str] = None,
+    description: Optional[str] = None,
+    exclude: Union[Set[Union[int, str]], Mapping[Union[int, str], Any], Any] = None,
+    include: Union[Set[Union[int, str]], Mapping[Union[int, str], Any], Any] = None,
+    const: Optional[bool] = None,
+    gt: Optional[float] = None,
+    ge: Optional[float] = None,
+    lt: Optional[float] = None,
+    le: Optional[float] = None,
+    multiple_of: Optional[float] = None,
+    allow_inf_nan: Optional[bool] = None,
+    max_digits: Optional[int] = None,
+    decimal_places: Optional[int] = None,
+    min_items: Optional[int] = None,
+    max_items: Optional[int] = None,
+    unique_items: Optional[bool] = None,
+    min_length: Optional[int] = None,
+    max_length: Optional[int] = None,
+    allow_mutation: bool = True,
+    regex: Optional[str] = None,
+    discriminator: Optional[str] = None,
+    repr: bool = True,
+    **extra: Any,
+) -> T: ...
 @overload
-def Param(*, default_factory: Callable[[], T]) -> T: ...
+def Param(
+    *,
+    default_factory: Supplier[T],
+    alias: Optional[str] = None,
+    title: Optional[str] = None,
+    description: Optional[str] = None,
+    exclude: Union[Set[Union[int, str]], Mapping[Union[int, str], Any], Any] = None,
+    include: Union[Set[Union[int, str]], Mapping[Union[int, str], Any], Any] = None,
+    const: Optional[bool] = None,
+    gt: Optional[float] = None,
+    ge: Optional[float] = None,
+    lt: Optional[float] = None,
+    le: Optional[float] = None,
+    multiple_of: Optional[float] = None,
+    allow_inf_nan: Optional[bool] = None,
+    max_digits: Optional[int] = None,
+    decimal_places: Optional[int] = None,
+    min_items: Optional[int] = None,
+    max_items: Optional[int] = None,
+    unique_items: Optional[bool] = None,
+    min_length: Optional[int] = None,
+    max_length: Optional[int] = None,
+    allow_mutation: bool = True,
+    regex: Optional[str] = None,
+    discriminator: Optional[str] = None,
+    repr: bool = True,
+    **extra: Any,
+) -> T: ...
