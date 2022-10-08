@@ -34,7 +34,7 @@ class BoundArguments:
 @dataclass(frozen=True)
 class Parameter(Generic[T]):
     name: str
-    default: T
+    default: Union[T, MissingType] = Missing
     annotation: Union[Any, MissingType] = Missing
     type: ParameterType = ParameterType.POSITIONAL_OR_KEYWORD
 
