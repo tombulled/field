@@ -1,9 +1,10 @@
 from typing import Any, Callable, Dict
 
 from param import Param, manager, parameters, params
-from param.api import get_arguments, get_params
+from param.api import get_arguments, get_params, MANAGER
 from param.enums import ParameterType
-from param.models import Arguments, BoundArguments, Parameter
+from param.models import Arguments, BoundArguments, Parameter, Resolvable
+from param.sentinels import Missing
 from param.wrappers import Param
 from pytest import fixture
 
@@ -84,21 +85,59 @@ def test_get_params() -> None:
     assert get_params(func) == {
         "a": Parameter(
             name="a",
-            default=parameters.Param(),
+            default=Missing,
             annotation=int,
             type=ParameterType.POSITIONAL_OR_KEYWORD,
         ),
         "b": Parameter(
             name="b",
-            default=parameters.Param(default="b"),
+            default="b",
             annotation=str,
             type=ParameterType.POSITIONAL_OR_KEYWORD,
         ),
         "c": Parameter(
             name="c",
-            default=parameters.Param(),
+            default=Missing,
             annotation=bool,
             type=ParameterType.VAR_KEYWORD,
+        ),
+    }
+
+
+def test_get_resolvables() -> None:
+    def func(a: int, b: str = "b", c: bool = Param(default=True)) -> None:
+        ...
+
+    assert MANAGER.get_resolvables(func, Arguments(args=(123,))) == {
+        "a": Resolvable(
+            parameter=Parameter(
+                name="a",
+                default=Missing,
+                annotation=int,
+                type=ParameterType.POSITIONAL_OR_KEYWORD,
+            ),
+            specification=parameters.Param(),
+            argument=123,
+        ),
+        "b": Resolvable(
+            parameter=Parameter(
+                name="b",
+                default="b",
+                annotation=str,
+                type=ParameterType.POSITIONAL_OR_KEYWORD,
+            ),
+            specification=parameters.Param(default="b"),
+            argument="b",
+        ),
+        "c": Resolvable(
+            parameter=Parameter(
+                name="c",
+                default=parameters.Param(default=True),
+                annotation=bool,
+                type=ParameterType.POSITIONAL_OR_KEYWORD,
+            ),
+            specification=parameters.Param(default=True),
+            argument=Missing,
         ),
     }
 

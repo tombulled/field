@@ -12,7 +12,7 @@ MANAGER: ParameterManager = ParamManager()
 
 
 def get_params(func: Callable, /) -> Dict[str, Parameter]:
-    return MANAGER.get_params(func)
+    return MANAGER.get_parameters(func)
 
 
 def get_arguments(func: Callable, arguments: Arguments) -> BoundArguments:

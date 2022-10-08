@@ -3,10 +3,12 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Generic, Tuple, TypeVar, Union
 
 from .enums import ParameterType
+from .parameters import ParameterSpecification
 from .sentinels import Missing, MissingType
 from .utils import parse
 
 T = TypeVar("T")
+S = TypeVar("S", bound=ParameterSpecification)
 
 
 @dataclass(frozen=True)
@@ -32,9 +34,9 @@ class BoundArguments:
 
 
 @dataclass(frozen=True)
-class Parameter(Generic[T]):
+class Parameter:
     name: str
-    default: Union[T, MissingType] = Missing
+    default: Union[Any, MissingType] = Missing
     annotation: Union[Any, MissingType] = Missing
     type: ParameterType = ParameterType.POSITIONAL_OR_KEYWORD
 
@@ -42,7 +44,14 @@ class Parameter(Generic[T]):
     def from_parameter(cls, parameter: inspect.Parameter, /) -> "Parameter":
         return cls(
             name=parameter.name,
-            default=parameter.default,
+            default=parse(parameter.default),
             annotation=parse(parameter.annotation),
             type=ParameterType.from_kind(parameter.kind),
         )
+
+
+@dataclass(frozen=True)
+class Resolvable(Generic[S]):
+    parameter: Parameter
+    specification: S
+    argument: Union[Any, MissingType] = Missing
