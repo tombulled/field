@@ -11,7 +11,7 @@ RT = TypeVar("RT")
 MANAGER: ParameterManager = ParamManager()
 
 
-def get_params(func: Callable, /) -> Dict[str, Parameter]:
+def get_parameters(func: Callable, /) -> Dict[str, Parameter]:
     return MANAGER.get_parameters(func)
 
 

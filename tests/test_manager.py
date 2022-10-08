@@ -1,7 +1,7 @@
 from typing import Any, Callable, Dict
 
 from param import Param, manager, parameters, params
-from param.api import get_arguments, get_params, MANAGER
+from param.api import get_arguments, get_parameters, MANAGER
 from param.enums import ParameterType
 from param.models import Arguments, BoundArguments, Parameter, Resolvable
 from param.sentinels import Missing
@@ -82,7 +82,7 @@ def test_get_params() -> None:
     def func(a: int, b: str = "b", **c: bool) -> None:
         ...
 
-    assert get_params(func) == {
+    assert get_parameters(func) == {
         "a": Parameter(
             name="a",
             default=Missing,

@@ -36,7 +36,6 @@ class ParameterManager(Generic[R]):
 
     @staticmethod
     def get_parameters(func: Callable, /) -> Dict[str, Parameter]:
-        # TODO: Check parameter specifications are resolvable? (make this non-static)
         return {
             parameter.name: Parameter.from_parameter(parameter)
             for parameter in inspect.signature(func).parameters.values()

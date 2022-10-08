@@ -1,4 +1,4 @@
-from .api import get_arguments, get_params, params
+from .api import get_arguments, get_parameters, params
 from .enums import ParameterType
 from .errors import MissingSpecification, ResolutionError
 from .manager import ParameterManager, ParamManager
