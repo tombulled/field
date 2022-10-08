@@ -1,5 +1,5 @@
 import functools
-from typing import Any, Callable, TypeVar
+from typing import Callable, TypeVar
 
 from typing_extensions import ParamSpec
 
@@ -12,7 +12,7 @@ RT = TypeVar("RT")
 
 def params(func: Callable[PS, RT], /) -> Callable[PS, RT]:
     @functools.wraps(func)
-    def wrapper(*args: Any, **kwargs: Any) -> Any:
+    def wrapper(*args: PS.args, **kwargs: PS.kwargs) -> RT:
         arguments: Arguments = Arguments(args=args, kwargs=kwargs)
 
         bound_arguments: BoundArguments = get_arguments(func, arguments)

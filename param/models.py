@@ -1,5 +1,5 @@
-from dataclasses import dataclass, field
 import inspect
+from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Generic, Tuple, TypeVar, Union
 
 from .enums import ParameterType
