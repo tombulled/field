@@ -1,6 +1,9 @@
+import functools
 import inspect
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Generic, Optional, Type, TypeVar, Union
+
+from typing_extensions import ParamSpec
 
 from .enums import ParameterType
 from .errors import ResolutionError
@@ -9,6 +12,9 @@ from .parameters import Param, ParameterSpecification
 from .resolvers import RESOLVERS, Resolver, Resolvers
 from .sentinels import Missing, MissingType
 from .utils import parse
+
+PS = ParamSpec("PS")
+RT = TypeVar("RT")
 
 R = TypeVar("R", bound=Callable)
 
@@ -125,6 +131,17 @@ class ParameterManager(Generic[R]):
             source[parameter_name] = argument
 
         return bound_arguments
+
+    def params(self, func: Callable[PS, RT], /) -> Callable[PS, RT]:
+        @functools.wraps(func)
+        def wrapper(*args: PS.args, **kwargs: PS.kwargs) -> RT:
+            arguments: Arguments = Arguments(args=args, kwargs=kwargs)
+
+            bound_arguments: BoundArguments = self.get_arguments(func, arguments)
+
+            return bound_arguments.call(func)
+
+        return wrapper
 
 
 @dataclass
