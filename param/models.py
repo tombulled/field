@@ -4,6 +4,7 @@ from typing import Any, Callable, Dict, Generic, Tuple, TypeVar, Union
 
 from .enums import ParameterType
 from .sentinels import Missing, MissingType
+from .utils import parse
 
 T = TypeVar("T")
 
@@ -42,10 +43,6 @@ class Parameter(Generic[T]):
         return cls(
             name=parameter.name,
             default=parameter.default,
-            annotation=(
-                parameter.annotation
-                if parameter.annotation is not inspect.Parameter.empty
-                else Missing
-            ),
+            annotation=parse(parameter.annotation),
             type=ParameterType.from_kind(parameter.kind),
         )

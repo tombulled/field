@@ -26,6 +26,7 @@ def test_bound_arguments() -> None:
         "age": 10,
     }
 
+
 def test_parameter_from_parameter() -> None:
     inspect_parameter: inspect.Parameter = inspect.Parameter(
         name="foo",
