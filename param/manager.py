@@ -161,4 +161,7 @@ class ParamManager(ParameterManager[Resolver]):
         self,
         resolvable: Resolvable,
     ) -> Any:
-        return self.get_resolver(type(resolvable.specification))(resolvable)
+        resolver_cls: Type[ParameterSpecification] = type(resolvable.specification)
+        resolver: Resolver = self.get_resolver(resolver_cls)
+
+        return resolver(resolvable)
