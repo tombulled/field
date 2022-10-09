@@ -1,12 +1,16 @@
 from typing import Any, Mapping, Optional, Set, TypeVar, Union, overload
 
+from pydantic.fields import Undefined, UndefinedType
+
 from .typing import Supplier
 
 T = TypeVar("T")
 
 @overload
 def Param(
+    default: UndefinedType = Undefined,
     *,
+    default_factory: None = None,
     alias: Optional[str] = None,
     title: Optional[str] = None,
     description: Optional[str] = None,

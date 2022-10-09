@@ -1,10 +1,10 @@
 import pytest
-from param import Missing
 from param.parameters import Param
+from pydantic.fields import Undefined
 
 
 def test_param_spec_no_default() -> None:
-    assert Param().get_default() is Missing
+    assert Param().get_default() is Undefined
 
 
 def test_param_spec_default() -> None:

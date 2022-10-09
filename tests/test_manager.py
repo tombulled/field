@@ -4,9 +4,10 @@ from param import Param, manager, parameters, params
 from param.api import get_arguments, get_parameters, MANAGER
 from param.enums import ParameterType
 from param.models import Arguments, BoundArguments, Parameter, Resolvable
-from param.sentinels import Missing
 from param.wrappers import Param
 from pytest import fixture
+
+from pydantic.fields import Undefined
 
 
 class Class:
@@ -85,7 +86,7 @@ def test_get_params() -> None:
     assert get_parameters(func) == {
         "a": Parameter(
             name="a",
-            default=Missing,
+            default=Undefined,
             annotation=int,
             type=ParameterType.POSITIONAL_OR_KEYWORD,
         ),
@@ -97,7 +98,7 @@ def test_get_params() -> None:
         ),
         "c": Parameter(
             name="c",
-            default=Missing,
+            default=Undefined,
             annotation=bool,
             type=ParameterType.VAR_KEYWORD,
         ),
@@ -112,7 +113,7 @@ def test_get_resolvables() -> None:
         "a": Resolvable(
             parameter=Parameter(
                 name="a",
-                default=Missing,
+                default=Undefined,
                 annotation=int,
                 type=ParameterType.POSITIONAL_OR_KEYWORD,
             ),
@@ -137,7 +138,7 @@ def test_get_resolvables() -> None:
                 type=ParameterType.POSITIONAL_OR_KEYWORD,
             ),
             field=parameters.Param(default=True),
-            argument=Missing,
+            argument=Undefined,
         ),
     }
 

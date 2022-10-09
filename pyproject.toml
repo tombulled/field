@@ -15,6 +15,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.8"
 roster = "^0.1.8"
+pydantic = "^1.10.2"
 
 [tool.poetry.dev-dependencies]
 mypy = "^0.971"
@@ -32,3 +33,6 @@ show_error_codes = true
 warn_redundant_casts = true
 warn_unused_configs = true
 warn_unused_ignores = true
+
+[tool.pytest.ini_options]
+testpaths = "tests"

@@ -56,7 +56,10 @@ def resolve_param(resolvable: Resolvable[Param], /) -> Any:
 
     if resolvable.argument is not Undefined:
         argument = resolvable.argument
-    elif resolvable.field.default is not Undefined or resolvable.field.default_factory is not None:
+    elif (
+        resolvable.field.default is not Undefined
+        or resolvable.field.default_factory is not None
+    ):
         argument = model_field.get_default()
     else:
         raise ResolutionError("No value provided and parameter has no default")

@@ -2,12 +2,15 @@ from pydantic import BaseConfig, BaseModel, constr
 from pydantic.fields import FieldInfo, ModelField, Field
 from pydantic.error_wrappers import ValidationError
 
+
 class MyModel(BaseModel):
     age: int
     name: str = Field(default="sam", max_length=5)
 
+
 def foo(name: str = Field(default="sam", max_length=5)):
     ...
+
 
 f = FieldInfo(default="sam", max_length=5)
 f._validate()

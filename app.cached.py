@@ -52,7 +52,12 @@ resolvers: Resolvers[Context] = Resolvers()
 
 
 @resolvers(Dependency)
-def resolve_dependency(parameter: Parameter[Dependency], context: Context, value: Union[Any, MissingType], /) -> Any:
+def resolve_dependency(
+    parameter: Parameter[Dependency],
+    context: Context,
+    value: Union[Any, MissingType],
+    /,
+) -> Any:
     if value is not Missing:
         return value
 
@@ -69,7 +74,12 @@ def resolve_dependency(parameter: Parameter[Dependency], context: Context, value
 
 
 @resolvers(ParamModel)
-def resolve_param(parameter: Parameter[ParamModel], context: Context, value: Union[Any, MissingType], /):
+def resolve_param(
+    parameter: Parameter[ParamModel],
+    context: Context,
+    value: Union[Any, MissingType],
+    /,
+):
     if value is not Missing:
         return value
     elif parameter.spec.has_default():
@@ -79,7 +89,9 @@ def resolve_param(parameter: Parameter[ParamModel], context: Context, value: Uni
 
 
 @resolvers(Body)
-def resolve_body(parameter: Parameter[BodyParam], context: Context, value: Union[Any, MissingType], /):
+def resolve_body(
+    parameter: Parameter[BodyParam], context: Context, value: Union[Any, MissingType], /
+):
     ...
 
 
@@ -105,7 +117,9 @@ class DependencyParameterManager(ParameterManager[Context]):
     ) -> ParameterSpecification:
         return Param(default=_parse(parameter.default))
 
-    def build_contexts(self, parameters: Dict[str, Parameter], arguments: Dict[str, Any]) -> Dict[str, Context]:
+    def build_contexts(
+        self, parameters: Dict[str, Parameter], arguments: Dict[str, Any]
+    ) -> Dict[str, Context]:
         dependency_cache: dict = {}
 
         return {

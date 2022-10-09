@@ -5,6 +5,7 @@ from pydantic.fields import Undefined
 from . import parameters
 from .typing import Supplier
 
+
 def Param(
     default: Any = Undefined,
     *,
