@@ -5,9 +5,8 @@ from param import Param, params
 def get(
     url: str,
     params: dict = Param(default_factory=dict),
-    name: str = Param(max_length=10),
 ):
-    print("GET", url, params, name)
+    print("GET", url, params)
 
 
 d = get("https://httpbin.com/get")

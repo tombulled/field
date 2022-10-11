@@ -2,7 +2,7 @@ import functools
 import inspect
 from dataclasses import dataclass, field
 from pydantic.fields import Undefined
-from typing import Any, Callable, Dict, Generic, Iterable, Optional, Type, TypeVar
+from typing import Any, Callable, Dict, Generic, Iterable, Optional, Tuple, Type, TypeVar
 
 from typing_extensions import ParamSpec
 
@@ -10,6 +10,7 @@ from .errors import ResolutionError
 from .models import Arguments, BoundArguments, Parameter, Resolvable
 from .parameters import Param
 from .resolvers import RESOLVERS, Resolver, Resolvers
+from .validation import ValidatedFunction
 
 PS = ParamSpec("PS")
 RT = TypeVar("RT")
@@ -125,15 +126,32 @@ class ParameterManager(Generic[R]):
         return BoundArguments(args=args, kwargs=kwargs)
 
     def params(self, func: Callable[PS, RT], /) -> Callable[PS, RT]:
+        # @functools.wraps(func)
+        # def wrapper(*args: PS.args, **kwargs: PS.kwargs) -> RT:
+        #     arguments: Arguments = Arguments(args=args, kwargs=kwargs)
+
+        #     bound_arguments: BoundArguments = self.get_arguments(func, arguments)
+
+        #     return bound_arguments.call(func)
+
+        # return wrapper
+
         @functools.wraps(func)
         def wrapper(*args: PS.args, **kwargs: PS.kwargs) -> RT:
-            arguments: Arguments = Arguments(args=args, kwargs=kwargs)
+            validated_function: ValidatedFunction = ValidatedFunction(func)
+
+            validated_args: Tuple[Any, ...]
+            validated_kwargs: Dict[str, Any]
+            validated_args, validated_kwargs = validated_function.validate_arguments(args, kwargs)
+
+            arguments: Arguments = Arguments(args=validated_args, kwargs=validated_kwargs)
 
             bound_arguments: BoundArguments = self.get_arguments(func, arguments)
 
             return bound_arguments.call(func)
 
-        return wrapper
+
+        return wrapper    
 
 
 @dataclass

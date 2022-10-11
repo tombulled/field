@@ -27,48 +27,50 @@ RESOLVERS: Resolvers[Resolver] = Resolvers()
 
 @RESOLVERS(Param)
 def resolve_param(resolvable: Resolvable[Param], /) -> Any:
-    annotation: Any
+    return resolvable.argument
+    
+    # annotation: Any
 
-    if resolvable.parameter.annotation is Undefined:
-        annotation = Any
-    else:
-        annotation = resolvable.parameter.annotation
+    # if resolvable.parameter.annotation is Undefined:
+    #     annotation = Any
+    # else:
+    #     annotation = resolvable.parameter.annotation
 
-    type_: Type[Any] = get_annotation_from_field_info(
-        annotation=annotation,
-        field_info=resolvable.field,
-        field_name=resolvable.parameter.name,
-    )
+    # type_: Type[Any] = get_annotation_from_field_info(
+    #     annotation=annotation,
+    #     field_info=resolvable.field,
+    #     field_name=resolvable.parameter.name,
+    # )
 
-    model_field = ModelField(
-        name=resolvable.parameter.name,
-        type_=type_,
-        class_validators=None,
-        model_config=BaseConfig,
-        default=resolvable.field.default,
-        default_factory=resolvable.field.default_factory,
-        required=resolvable.parameter.default is Required,
-        alias=resolvable.field.alias,
-        field_info=resolvable.field,
-    )
+    # model_field = ModelField(
+    #     name=resolvable.parameter.name,
+    #     type_=type_,
+    #     class_validators=None,
+    #     model_config=BaseConfig,
+    #     default=resolvable.field.default,
+    #     default_factory=resolvable.field.default_factory,
+    #     required=resolvable.parameter.default is Required,
+    #     alias=resolvable.field.alias,
+    #     field_info=resolvable.field,
+    # )
 
-    argument: Any
+    # argument: Any
 
-    if resolvable.argument is not Undefined:
-        argument = resolvable.argument
-    elif (
-        resolvable.field.default is not Undefined
-        or resolvable.field.default_factory is not None
-    ):
-        argument = model_field.get_default()
-    else:
-        raise ResolutionError("No value provided and parameter has no default")
+    # if resolvable.argument is not Undefined:
+    #     argument = resolvable.argument
+    # elif (
+    #     resolvable.field.default is not Undefined
+    #     or resolvable.field.default_factory is not None
+    # ):
+    #     argument = model_field.get_default()
+    # else:
+    #     raise ResolutionError("No value provided and parameter has no default")
 
-    value, errors = model_field.validate(
-        argument, {}, loc=resolvable.parameter.name, cls=BaseModel
-    )
+    # value, errors = model_field.validate(
+    #     argument, {}, loc=resolvable.parameter.name, cls=BaseModel
+    # )
 
-    if errors:
-        raise ValidationError([errors], BaseModel)
+    # if errors:
+    #     raise ValidationError([errors], BaseModel)
 
-    return value
+    # return value

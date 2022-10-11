@@ -69,6 +69,8 @@ class ValidatedFunction(Generic[PS, RT]):
     def __init__(
         self, function: Callable[PS, RT], /, *, config: Optional[ConfigType] = None
     ):
+        self.function = function  #  type: ignore
+
         parameters: Mapping[str, Parameter] = self.signature.parameters
         type_hints: Dict[str, Any] = get_all_type_hints(function)
         fields: Dict[str, Tuple[Any, Any]] = {}
@@ -93,7 +95,6 @@ class ValidatedFunction(Generic[PS, RT]):
             else:
                 fields[parameter_name] = (annotation, default)
 
-        self.function = function  #  type: ignore
         self.model = self._create_model(fields, config=config)
 
     def __repr__(self) -> str:
@@ -160,13 +161,16 @@ class ValidatedFunction(Generic[PS, RT]):
 
         return (tuple(args), kwargs)
 
-    def call(self, *args: PS.args, **kwargs: PS.kwargs) -> RT:
+    def validate_arguments(self, args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> Tuple[Tuple[Any, ...], Dict[str, Any]]:
         bound_arguments: Dict[str, Any] = self.bind_arguments(args, kwargs)
         model: BaseModel = self.model(**bound_arguments)
         arguments: Dict[str, Any] = model.dict()
 
+        return self.prepare_arguments(arguments)
+
+    def call(self, *args: PS.args, **kwargs: PS.kwargs) -> RT:
         validated_args: Tuple[Any, ...]
         validated_kwargs: Dict[str, Any]
-        validated_args, validated_kwargs = self.prepare_arguments(arguments)
+        validated_args, validated_kwargs = self.validate_arguments(args, kwargs)
 
         return self.function(*validated_args, **validated_kwargs)
