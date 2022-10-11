@@ -1,5 +1,5 @@
-from functools import wraps
-from inspect import Parameter, signature
+from functools import cached_property, wraps
+from inspect import Parameter, Signature, signature
 from typing import (
     Any,
     Callable,
@@ -14,13 +14,13 @@ from typing import (
     Union,
     overload,
 )
-from typing_extensions import ParamSpec
 
 from pydantic import Required
 from pydantic.config import Extra
 from pydantic.main import BaseModel, create_model
 from pydantic.typing import get_all_type_hints
 from pydantic.utils import to_camel
+from typing_extensions import ParamSpec
 
 PS = ParamSpec("PS")
 RT = TypeVar("RT")
@@ -43,10 +43,6 @@ def validate(func: Callable[PS, RT]) -> Callable[PS, RT]:
 def validate(
     func: Optional[Callable[PS, RT]] = None, *, config: Optional[ConfigType] = None
 ) -> Union[Callable[PS, RT], Callable[[Callable[PS, RT]], Callable[PS, RT]]]:
-    """
-    Decorator to validate the arguments passed to a function.
-    """
-
     def decorate(func: Callable[PS, RT], /) -> Callable[PS, RT]:
         validated_func: ValidatedFunction[PS, RT] = ValidatedFunction(
             func, config=config
@@ -68,43 +64,40 @@ def validate(
 
 class ValidatedFunction(Generic[PS, RT]):
     function: Callable[PS, RT]
-    parameters: Mapping[str, Parameter]
     model: Type[BaseModel]
 
     def __init__(
         self, function: Callable[PS, RT], /, *, config: Optional[ConfigType] = None
     ):
-        parameters: Mapping[str, Parameter] = signature(function).parameters
+        parameters: Mapping[str, Parameter] = self.signature.parameters
         type_hints: Dict[str, Any] = get_all_type_hints(function)
         fields: Dict[str, Tuple[Any, Any]] = {}
 
         parameter_name: str
         parameter: Parameter
         for parameter_name, parameter in parameters.items():
-            annotation: Any
+            annotation: Any = (
+                Any
+                if parameter.annotation is Parameter.empty
+                else type_hints[parameter_name]
+            )
 
-            if parameter.annotation is Parameter.empty:
-                annotation = Any
-            else:
-                annotation = type_hints[parameter_name]
+            default: Any = (
+                Required if parameter.default is Parameter.empty else parameter.default
+            )
 
-            default: Any
-
-            if parameter.default is Parameter.empty:
-                default = Required
-            else:
-                default = parameter.default
-
-            if parameter.kind == Parameter.VAR_POSITIONAL:
+            if parameter.kind is Parameter.VAR_POSITIONAL:
                 fields[parameter_name] = (Tuple[annotation, ...], None)
-            elif parameter.kind == Parameter.VAR_KEYWORD:
+            elif parameter.kind is Parameter.VAR_KEYWORD:
                 fields[parameter_name] = (Dict[str, annotation], None)
             else:
                 fields[parameter_name] = (annotation, default)
 
         self.function = function  #  type: ignore
-        self.parameters = parameters
         self.model = self._create_model(fields, config=config)
+
+    def __repr__(self) -> str:
+        return f"<{type(self).__name__}(function={self.function!r})>"
 
     def _create_model(
         self, fields: Dict[str, Any], *, config: Optional[ConfigType] = None
@@ -134,43 +127,14 @@ class ValidatedFunction(Generic[PS, RT]):
             **fields,
         )
 
+    @cached_property
+    def signature(self) -> Signature:
+        return signature(self.function)
+
     def bind_arguments(
         self, args: Tuple[Any, ...], kwargs: Dict[str, Any]
     ) -> Dict[str, Any]:
-        """
-        Build the arguments required to instantiate the model
-
-        For example:
-            def say(message: str, shout: bool = False):
-                ...
-        would generate the model:
-            class Say(BaseModel):
-                message: str
-                shout: bool = False
-        and when invoked as:
-            say("hello")
-        would generate "values" of:
-            {"message": "hello"}
-        """
-        # TODO: Throw an exception if a required argument is missing (for when Field() used)
-        # E.g:
-        #   def greet(name: str = Field(...)):
-        #       ...
-        #   greet() # throw!
-
-        # NOTE: Support aliases?
-        # E.g:
-        #   def greet(name: str = Field(alias="nom")):
-        #       ...
-        #   greet(nom="sam")
-
-        # TODO: Throw the following TypeErrors:
-        #   * n positional arguments expected but k given
-        #   * unexpected keyword argument(s): 'foo', 'bar'
-        #   * positional-only arguments passed as keyword arguments: 'foo', 'bar'
-        #   * multiple values for arguments: 'foo', 'bar'
-
-        return signature(self.function).bind(*args, **kwargs).arguments
+        return self.signature.bind(*args, **kwargs).arguments
 
     def prepare_arguments(
         self, arguments: Dict[str, Any], /
@@ -179,7 +143,7 @@ class ValidatedFunction(Generic[PS, RT]):
         kwargs: Dict[str, Any] = {}
 
         parameter: Parameter
-        for parameter in self.parameters.values():
+        for parameter in self.signature.parameters.values():
             argument: Any = arguments[parameter.name]
 
             if parameter.kind in (
@@ -187,11 +151,11 @@ class ValidatedFunction(Generic[PS, RT]):
                 Parameter.POSITIONAL_OR_KEYWORD,
             ):
                 args.append(argument)
-            elif parameter.kind == Parameter.KEYWORD_ONLY:
+            elif parameter.kind is Parameter.KEYWORD_ONLY:
                 kwargs[parameter.name] = argument
-            elif parameter.kind == Parameter.VAR_POSITIONAL:
+            elif parameter.kind is Parameter.VAR_POSITIONAL:
                 args.extend(argument)
-            elif parameter.kind == Parameter.VAR_KEYWORD:
+            elif parameter.kind is Parameter.VAR_KEYWORD:
                 kwargs.update(argument)
 
         return (tuple(args), kwargs)
