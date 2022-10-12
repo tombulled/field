@@ -161,7 +161,9 @@ class ValidatedFunction(Generic[PS, RT]):
 
         return (tuple(args), kwargs)
 
-    def validate_arguments(self, args: Tuple[Any, ...], kwargs: Dict[str, Any]) -> Tuple[Tuple[Any, ...], Dict[str, Any]]:
+    def validate_arguments(
+        self, args: Tuple[Any, ...], kwargs: Dict[str, Any]
+    ) -> Tuple[Tuple[Any, ...], Dict[str, Any]]:
         bound_arguments: Dict[str, Any] = self.bind_arguments(args, kwargs)
         model: BaseModel = self.model(**bound_arguments)
         arguments: Dict[str, Any] = model.dict()

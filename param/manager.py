@@ -2,7 +2,17 @@ import functools
 import inspect
 from dataclasses import dataclass, field
 from pydantic.fields import Undefined
-from typing import Any, Callable, Dict, Generic, Iterable, Optional, Tuple, Type, TypeVar
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    Iterable,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+)
 
 from typing_extensions import ParamSpec
 
@@ -142,16 +152,19 @@ class ParameterManager(Generic[R]):
 
             validated_args: Tuple[Any, ...]
             validated_kwargs: Dict[str, Any]
-            validated_args, validated_kwargs = validated_function.validate_arguments(args, kwargs)
+            validated_args, validated_kwargs = validated_function.validate_arguments(
+                args, kwargs
+            )
 
-            arguments: Arguments = Arguments(args=validated_args, kwargs=validated_kwargs)
+            arguments: Arguments = Arguments(
+                args=validated_args, kwargs=validated_kwargs
+            )
 
             bound_arguments: BoundArguments = self.get_arguments(func, arguments)
 
             return bound_arguments.call(func)
 
-
-        return wrapper    
+        return wrapper
 
 
 @dataclass
