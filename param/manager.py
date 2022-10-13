@@ -136,16 +136,6 @@ class ParameterManager(Generic[R]):
         return BoundArguments(args=args, kwargs=kwargs)
 
     def params(self, func: Callable[PS, RT], /) -> Callable[PS, RT]:
-        # @functools.wraps(func)
-        # def wrapper(*args: PS.args, **kwargs: PS.kwargs) -> RT:
-        #     arguments: Arguments = Arguments(args=args, kwargs=kwargs)
-
-        #     bound_arguments: BoundArguments = self.get_arguments(func, arguments)
-
-        #     return bound_arguments.call(func)
-
-        # return wrapper
-
         @functools.wraps(func)
         def wrapper(*args: PS.args, **kwargs: PS.kwargs) -> RT:
             validated_function: ValidatedFunction = ValidatedFunction(func)

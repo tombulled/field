@@ -1,9 +1,38 @@
-from typing import Mapping, Set, Union, Any, Optional
+from dataclasses import dataclass
+from typing import Dict, Mapping, Set, Union, Any, Optional
 from pydantic.fields import FieldInfo, Undefined, UndefinedType
 from .typing import Supplier
 
 
+@dataclass(init=False)
 class Param(FieldInfo):
+    default: Union[Any, UndefinedType]
+    default_factory: Optional[Supplier[Any]]
+    alias: Optional[str]
+    title: Optional[str]
+    description: Optional[str]
+    exclude: Union[Set[Union[int, str]], Mapping[Union[int, str], Any], Any]
+    include: Union[Set[Union[int, str]], Mapping[Union[int, str], Any], Any]
+    const: Optional[bool]
+    gt: Optional[float]
+    ge: Optional[float]
+    lt: Optional[float]
+    le: Optional[float]
+    multiple_of: Optional[float]
+    allow_inf_nan: Optional[bool]
+    max_digits: Optional[int]
+    decimal_places: Optional[int]
+    min_items: Optional[int]
+    max_items: Optional[int]
+    unique_items: Optional[bool]
+    min_length: Optional[int]
+    max_length: Optional[int]
+    allow_mutation: bool
+    regex: Optional[str]
+    discriminator: Optional[str]
+    repr: bool
+    extra: Dict[str, Any]
+
     def __init__(
         self,
         default: Union[Any, UndefinedType] = Undefined,
