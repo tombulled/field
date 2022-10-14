@@ -8,7 +8,6 @@ from typing import (
     Generic,
     Iterable,
     Optional,
-    Tuple,
     Type,
     TypeVar,
 )
@@ -20,7 +19,6 @@ from .errors import ResolutionError
 from .models import Arguments, BoundArguments, Parameter, Resolvable
 from .parameters import Param
 from .resolvers import RESOLVERS, Resolver, Resolvers
-from .validation import ValidatedFunction
 
 PS = ParamSpec("PS")
 RT = TypeVar("RT")
