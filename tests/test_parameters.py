@@ -1,6 +1,6 @@
-from param.parameters import Param
-
 from pydantic.fields import Undefined
+
+from param.parameters import Param
 
 
 def test_no_default() -> None:
