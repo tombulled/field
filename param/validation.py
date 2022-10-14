@@ -1,7 +1,19 @@
 from functools import cached_property, wraps
 from inspect import Parameter, Signature, signature
-from typing import (Any, Callable, Dict, Generic, List, Mapping, Optional,
-                    Tuple, Type, TypeVar, Union, overload)
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generic,
+    List,
+    Mapping,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Union,
+    overload,
+)
 
 from pydantic import Required
 from pydantic.config import Extra

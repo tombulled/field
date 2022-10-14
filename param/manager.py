@@ -1,8 +1,7 @@
 import functools
 import inspect
 from dataclasses import dataclass, field
-from typing import (Any, Callable, Dict, Generic, Iterable, Optional, Type,
-                    TypeVar)
+from typing import Any, Callable, Dict, Generic, Iterable, Optional, Type, TypeVar
 
 from pydantic.fields import Undefined
 from typing_extensions import ParamSpec
