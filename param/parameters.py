@@ -6,8 +6,19 @@ from pydantic.fields import FieldInfo, Undefined, UndefinedType
 from .typing import Supplier
 
 
+class BaseParam(FieldInfo):
+    def has_default(self) -> bool:
+        return self.default is not Undefined or self.default_factory is not None
+
+    def get_default(self) -> Any:
+        if self.default_factory is not None:
+            return self.default_factory()
+        else:
+            return self.default
+
+
 @dataclass(init=False)
-class Param(FieldInfo):
+class Param(BaseParam):
     default: Union[Any, UndefinedType]
     default_factory: Optional[Supplier[Any]]
     alias: Optional[str]

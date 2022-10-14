@@ -3,7 +3,6 @@ from typing import Any, Callable, Protocol, Type, TypeVar
 from pydantic.fields import Undefined
 from roster import Register
 
-from . import utils
 from .errors import ResolutionError
 from .models import Resolvable
 from .parameters import Param
@@ -27,7 +26,7 @@ RESOLVERS: Resolvers[Resolver] = Resolvers()
 def resolve_param(resolvable: Resolvable[Param], /) -> Any:
     if resolvable.argument is not Undefined:
         return resolvable.argument
-    elif utils.has_default(resolvable.field):
-        return utils.get_default(resolvable.field)
+    elif resolvable.field.has_default():
+        return resolvable.field.get_default()
     else:
         raise ResolutionError("No value provided and parameter has no default")
