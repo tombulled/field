@@ -52,7 +52,7 @@ class ParameterManager(Generic[R]):
             for parameter in inspect.signature(func).parameters.values()
         }
 
-    def get_parameter_specification(self, parameter: Parameter, /) -> Optional[Param]:
+    def get_param(self, parameter: Parameter, /) -> Optional[Param]:
         if isinstance(parameter.default, Param):
             return parameter.default
         else:
@@ -90,7 +90,7 @@ class ParameterManager(Generic[R]):
         argument: Any
         for parameter_name, argument in bound_arguments.arguments.items():
             parameter: Parameter = parameters[parameter_name]
-            specification: Optional[Param] = self.get_parameter_specification(parameter)
+            specification: Optional[Param] = self.get_param(parameter)
 
             if specification is None:
                 continue
@@ -138,17 +138,7 @@ class ParameterManager(Generic[R]):
     def params(self, func: Callable[PS, RT], /) -> Callable[PS, RT]:
         @functools.wraps(func)
         def wrapper(*args: PS.args, **kwargs: PS.kwargs) -> RT:
-            validated_function: ValidatedFunction = ValidatedFunction(func)
-
-            validated_args: Tuple[Any, ...]
-            validated_kwargs: Dict[str, Any]
-            validated_args, validated_kwargs = validated_function.validate_arguments(
-                args, kwargs
-            )
-
-            arguments: Arguments = Arguments(
-                args=validated_args, kwargs=validated_kwargs
-            )
+            arguments: Arguments = Arguments(args=args, kwargs=kwargs)
 
             bound_arguments: BoundArguments = self.get_arguments(func, arguments)
 
@@ -161,8 +151,8 @@ class ParameterManager(Generic[R]):
 class ParamManager(ParameterManager[Resolver]):
     resolvers: Resolvers[Resolver] = field(default_factory=lambda: RESOLVERS)
 
-    def get_parameter_specification(self, parameter: Parameter, /) -> Param:
-        specification: Optional[Param] = super().get_parameter_specification(parameter)
+    def get_param(self, parameter: Parameter, /) -> Param:
+        specification: Optional[Param] = super().get_param(parameter)
 
         if specification is not None:
             return specification
