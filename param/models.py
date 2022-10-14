@@ -1,7 +1,8 @@
 import inspect
 from dataclasses import dataclass, field
-from pydantic.fields import Undefined, UndefinedType
 from typing import Any, Callable, Dict, Generic, Tuple, TypeVar, Union
+
+from pydantic.fields import Undefined, UndefinedType
 
 from .enums import ParameterType
 from .parameters import Param

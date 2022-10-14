@@ -1,6 +1,8 @@
-from param import utils
 from inspect import Parameter
+
 from pydantic.fields import Undefined
+
+from param import utils
 
 
 def test_parse():

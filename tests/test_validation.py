@@ -1,6 +1,6 @@
-from param.validation import validate
-
 from typing import Any, Dict
+
+from param.validation import validate
 
 
 def test_validate_all_no_defaults() -> None:

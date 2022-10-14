@@ -34,7 +34,6 @@ def Param(
     regex: Optional[str] = None,
     discriminator: Optional[str] = None,
     repr: bool = True,
-    **extra: Any,
 ) -> Any: ...
 @overload
 def Param(
@@ -63,7 +62,6 @@ def Param(
     regex: Optional[str] = None,
     discriminator: Optional[str] = None,
     repr: bool = True,
-    **extra: Any,
 ) -> T: ...
 @overload
 def Param(
@@ -92,5 +90,4 @@ def Param(
     regex: Optional[str] = None,
     discriminator: Optional[str] = None,
     repr: bool = True,
-    **extra: Any,
 ) -> T: ...

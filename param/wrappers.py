@@ -1,5 +1,5 @@
-from typing import Mapping, Set, Union
-from typing import Any, Optional
+from typing import Any, Mapping, Optional, Set, Union
+
 from pydantic.fields import Undefined
 
 from . import parameters
@@ -33,7 +33,6 @@ def Param(
     regex: Optional[str] = None,
     discriminator: Optional[str] = None,
     repr: bool = True,
-    **extra: Any,
 ) -> parameters.Param:
     param: parameters.Param = parameters.Param(
         default,
@@ -61,7 +60,6 @@ def Param(
         regex=regex,
         discriminator=discriminator,
         repr=repr,
-        **extra,
     )
 
     param._validate()

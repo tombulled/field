@@ -1,7 +1,6 @@
 import functools
 import inspect
 from dataclasses import dataclass, field
-from pydantic.fields import Undefined
 from typing import (
     Any,
     Callable,
@@ -14,6 +13,7 @@ from typing import (
     TypeVar,
 )
 
+from pydantic.fields import Undefined
 from typing_extensions import ParamSpec
 
 from .errors import ResolutionError
