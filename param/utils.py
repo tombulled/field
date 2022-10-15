@@ -1,11 +1,11 @@
 import inspect
 from typing import Any, Union
 
-from .sentinels import Missing, MissingType
+from pydantic.fields import Undefined, UndefinedType
 
 
-def parse(value: Any, /) -> Union[Any, MissingType]:
+def parse(value: Any, /) -> Union[Any, UndefinedType]:
     if value is inspect.Parameter.empty:
-        return Missing
+        return Undefined
     else:
         return value

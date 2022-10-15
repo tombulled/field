@@ -2,13 +2,14 @@ import inspect
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, Generic, Tuple, TypeVar, Union
 
+from pydantic.fields import Undefined, UndefinedType
+
 from .enums import ParameterType
-from .parameters import ParameterSpecification
-from .sentinels import Missing, MissingType
+from .parameters import Param
 from .utils import parse
 
 T = TypeVar("T")
-S = TypeVar("S", bound=ParameterSpecification)
+P = TypeVar("P", bound=Param)
 
 
 @dataclass(frozen=True)
@@ -36,8 +37,8 @@ class BoundArguments:
 @dataclass(frozen=True)
 class Parameter:
     name: str
-    default: Union[Any, MissingType] = Missing
-    annotation: Union[Any, MissingType] = Missing
+    default: Union[Any, UndefinedType] = Undefined
+    annotation: Union[Any, UndefinedType] = Undefined
     type: ParameterType = ParameterType.POSITIONAL_OR_KEYWORD
 
     @classmethod
@@ -51,7 +52,7 @@ class Parameter:
 
 
 @dataclass(frozen=True)
-class Resolvable(Generic[S]):
+class Resolvable(Generic[P]):
     parameter: Parameter
-    specification: S
-    argument: Union[Any, MissingType] = Missing
+    field: P
+    argument: Union[Any, UndefinedType] = Undefined

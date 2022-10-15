@@ -1,12 +1,13 @@
 from typing import Any, Callable, Dict
 
+from pydantic.fields import Undefined
+from pytest import fixture
+
 from param import Param, manager, parameters, params
-from param.api import get_arguments, get_parameters, MANAGER
+from param.api import MANAGER, get_arguments, get_parameters
 from param.enums import ParameterType
 from param.models import Arguments, BoundArguments, Parameter, Resolvable
-from param.sentinels import Missing
 from param.wrappers import Param
-from pytest import fixture
 
 
 class Class:
@@ -85,7 +86,7 @@ def test_get_params() -> None:
     assert get_parameters(func) == {
         "a": Parameter(
             name="a",
-            default=Missing,
+            default=Undefined,
             annotation=int,
             type=ParameterType.POSITIONAL_OR_KEYWORD,
         ),
@@ -97,7 +98,7 @@ def test_get_params() -> None:
         ),
         "c": Parameter(
             name="c",
-            default=Missing,
+            default=Undefined,
             annotation=bool,
             type=ParameterType.VAR_KEYWORD,
         ),
@@ -112,11 +113,11 @@ def test_get_resolvables() -> None:
         "a": Resolvable(
             parameter=Parameter(
                 name="a",
-                default=Missing,
+                default=Undefined,
                 annotation=int,
                 type=ParameterType.POSITIONAL_OR_KEYWORD,
             ),
-            specification=parameters.Param(),
+            field=parameters.Param(),
             argument=123,
         ),
         "b": Resolvable(
@@ -126,7 +127,7 @@ def test_get_resolvables() -> None:
                 annotation=str,
                 type=ParameterType.POSITIONAL_OR_KEYWORD,
             ),
-            specification=parameters.Param(default="b"),
+            field=parameters.Param(default="b"),
             argument="b",
         ),
         "c": Resolvable(
@@ -136,8 +137,8 @@ def test_get_resolvables() -> None:
                 annotation=bool,
                 type=ParameterType.POSITIONAL_OR_KEYWORD,
             ),
-            specification=parameters.Param(default=True),
-            argument=Missing,
+            field=parameters.Param(default=True),
+            argument=Undefined,
         ),
     }
 

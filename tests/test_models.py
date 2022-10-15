@@ -1,7 +1,8 @@
 import inspect
+from typing import Any
+
 from param.enums import ParameterType
 from param.models import Arguments, BoundArguments, Parameter
-from typing import Any
 
 
 def test_arguments() -> None:
