@@ -1,3 +1,4 @@
+import dataclasses
 import functools
 import inspect
 from dataclasses import dataclass, field
@@ -156,3 +157,23 @@ class ParamManager(ParameterManager[Resolver]):
         resolver: Resolver = self.get_resolver(resolver_cls)
 
         return resolver(resolvable)
+
+    def get_resolvables(
+        self, func: Callable, arguments: Arguments, /
+    ) -> Dict[str, Resolvable]:
+        resolvables: Dict[str, Resolvable] = {}
+
+        parameter_name: str
+        resolvable: Resolvable
+        for parameter_name, resolvable in super().get_resolvables(func, arguments).items():
+            parameter: Parameter = resolvable.parameter
+            field: Param = resolvable.field
+
+            if field.alias is None:
+                field = dataclasses.replace(field, alias=field.generate_alias(parameter.name))
+
+                resolvable = dataclasses.replace(resolvable, field=field)
+
+            resolvables[parameter_name] = resolvable
+
+        return resolvables

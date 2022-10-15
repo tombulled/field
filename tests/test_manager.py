@@ -117,7 +117,7 @@ def test_get_resolvables() -> None:
                 annotation=int,
                 type=ParameterType.POSITIONAL_OR_KEYWORD,
             ),
-            field=parameters.Param(),
+            field=parameters.Param(alias="a"),
             argument=123,
         ),
         "b": Resolvable(
@@ -127,7 +127,7 @@ def test_get_resolvables() -> None:
                 annotation=str,
                 type=ParameterType.POSITIONAL_OR_KEYWORD,
             ),
-            field=parameters.Param(default="b"),
+            field=parameters.Param(alias="b", default="b"),
             argument="b",
         ),
         "c": Resolvable(
@@ -137,7 +137,7 @@ def test_get_resolvables() -> None:
                 annotation=bool,
                 type=ParameterType.POSITIONAL_OR_KEYWORD,
             ),
-            field=parameters.Param(default=True),
+            field=parameters.Param(alias="c", default=True),
             argument=Undefined,
         ),
     }

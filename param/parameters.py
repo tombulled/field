@@ -6,19 +6,8 @@ from pydantic.fields import FieldInfo, Undefined, UndefinedType
 from .typing import Supplier
 
 
-class BaseParam(FieldInfo):
-    def has_default(self) -> bool:
-        return self.default is not Undefined or self.default_factory is not None
-
-    def get_default(self) -> Any:
-        if self.default_factory is not None:
-            return self.default_factory()
-        else:
-            return self.default
-
-
 @dataclass(frozen=True)
-class Param(BaseParam):
+class Param(FieldInfo):
     default: Union[Any, UndefinedType] = Undefined
     default_factory: Optional[Supplier[Any]] = None
     alias: Optional[str] = None
@@ -45,3 +34,16 @@ class Param(BaseParam):
     discriminator: Optional[str] = None
     repr: bool = True
     extra: Dict[str, Any] = field(default_factory=dict)
+
+    def has_default(self) -> bool:
+        return self.default is not Undefined or self.default_factory is not None
+
+    def get_default(self) -> Any:
+        if self.default_factory is not None:
+            return self.default_factory()
+        else:
+            return self.default
+
+    @staticmethod
+    def generate_alias(alias: str, /) -> str:
+        return alias
