@@ -165,12 +165,16 @@ class ParamManager(ParameterManager[Resolver]):
 
         parameter_name: str
         resolvable: Resolvable
-        for parameter_name, resolvable in super().get_resolvables(func, arguments).items():
+        for parameter_name, resolvable in (
+            super().get_resolvables(func, arguments).items()
+        ):
             parameter: Parameter = resolvable.parameter
             field: Param = resolvable.field
 
             if field.alias is None:
-                field = dataclasses.replace(field, alias=field.generate_alias(parameter.name))
+                field = dataclasses.replace(
+                    field, alias=field.generate_alias(parameter.name)
+                )
 
                 resolvable = dataclasses.replace(resolvable, field=field)
 
