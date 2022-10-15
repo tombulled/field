@@ -156,7 +156,7 @@ class ParamManager(ParameterManager[Resolver]):
         resolver_cls: Type[Param] = type(resolvable.field)
         resolver: Resolver = self.get_resolver(resolver_cls)
 
-        return resolver(resolvable)
+        return resolver(resolvable.field, resolvable.argument)
 
     def get_resolvables(
         self, func: Callable, arguments: Arguments, /
