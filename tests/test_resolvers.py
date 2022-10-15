@@ -1,55 +1,66 @@
+import pytest
 from pydantic.fields import Undefined
 
 from param import resolvers
-from param.enums import ParameterType
-from param.models import Parameter, Resolvable
+from param.errors import ResolutionError
 from param.parameters import Param
 
 
-def test_resolve_param_has_argument() -> None:
-    resolvable: Resolvable = Resolvable(
-        parameter=Parameter(
-            name="foo",
-            default=123,
-            annotation=int,
-            type=ParameterType.POSITIONAL_ONLY,
-        ),
-        field=Param(
-            default=123,
-        ),
-        argument=456,
+def test_resolve_param_default_has_argument() -> None:
+    assert (
+        resolvers.resolve_param(
+            param=Param(
+                alias="foo",
+                default=123,
+            ),
+            argument=456,
+        )
+        == 456
     )
 
-    assert resolvers.resolve_param(resolvable) == 456
 
-
-def test_resolve_param_has_default() -> None:
-    resolvable: Resolvable = Resolvable(
-        parameter=Parameter(
-            name="foo",
-            default=123,
-            annotation=int,
-            type=ParameterType.POSITIONAL_ONLY,
-        ),
-        field=Param(
-            default=123,
-        ),
-        argument=Undefined,
+def test_resolve_param_default_no_argument() -> None:
+    assert (
+        resolvers.resolve_param(
+            param=Param(
+                alias="foo",
+                default=123,
+            ),
+            argument=Undefined,
+        )
+        == 123
     )
 
-    assert resolvers.resolve_param(resolvable) == 123
 
-
-def test_resolve_param_has_default_factory() -> None:
-    resolvable: Resolvable = Resolvable(
-        parameter=Parameter(
-            name="foo",
-            default=Undefined,
-            annotation=int,
-            type=ParameterType.POSITIONAL_ONLY,
-        ),
-        field=Param(default_factory=lambda: 123),
-        argument=Undefined,
+def test_resolve_param_default_factory_has_argument() -> None:
+    assert (
+        resolvers.resolve_param(
+            param=Param(
+                alias="foo",
+                default_factory=lambda: 123,
+            ),
+            argument=456,
+        )
+        == 456
     )
 
-    assert resolvers.resolve_param(resolvable) == 123
+
+def test_resolve_param_default_factory_no_argument() -> None:
+    assert (
+        resolvers.resolve_param(
+            param=Param(
+                alias="foo",
+                default_factory=lambda: 123,
+            ),
+            argument=Undefined,
+        )
+        == 123
+    )
+
+
+def test_resolve_param_no_default_no_argument() -> None:
+    with pytest.raises(ResolutionError):
+        resolvers.resolve_param(
+            param=Param(alias="foo"),
+            argument=Undefined,
+        )

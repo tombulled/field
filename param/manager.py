@@ -156,7 +156,7 @@ class ParamManager(ParameterManager[Resolver]):
         resolver_cls: Type[Param] = type(resolvable.field)
         resolver: Resolver = self.get_resolver(resolver_cls)
 
-        return resolver(resolvable)
+        return resolver(resolvable.field, resolvable.argument)
 
     def get_resolvables(
         self, func: Callable, arguments: Arguments, /
@@ -165,12 +165,16 @@ class ParamManager(ParameterManager[Resolver]):
 
         parameter_name: str
         resolvable: Resolvable
-        for parameter_name, resolvable in super().get_resolvables(func, arguments).items():
+        for parameter_name, resolvable in (
+            super().get_resolvables(func, arguments).items()
+        ):
             parameter: Parameter = resolvable.parameter
             field: Param = resolvable.field
 
             if field.alias is None:
-                field = dataclasses.replace(field, alias=field.generate_alias(parameter.name))
+                field = dataclasses.replace(
+                    field, alias=field.generate_alias(parameter.name)
+                )
 
                 resolvable = dataclasses.replace(resolvable, field=field)
 
