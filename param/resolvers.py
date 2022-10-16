@@ -1,4 +1,4 @@
-from typing import Any, Callable, Protocol, Type, TypeVar, Union
+from typing import Any, Protocol, Type, TypeVar, Union
 
 from pydantic.fields import Undefined, UndefinedType
 from roster import Register
@@ -6,12 +6,13 @@ from roster import Register
 from .errors import ResolutionError
 from .parameters import Param
 
-R = TypeVar("R", bound=Callable)
-
 
 class Resolver(Protocol):
     def __call__(self, param: Param, argument: Union[Any, UndefinedType]) -> Any:
         ...
+
+
+R = TypeVar("R", bound=Resolver)
 
 
 class Resolvers(Register[Type[Param], R]):
