@@ -4,6 +4,7 @@ from typing_extensions import ParamSpec
 
 from .manager import ParameterManager, ParamManager
 from .models import Arguments, BoundArguments, Parameter
+from .typing import AnyCallable
 
 PS = ParamSpec("PS")
 RT = TypeVar("RT")
@@ -11,11 +12,11 @@ RT = TypeVar("RT")
 MANAGER: ParameterManager = ParamManager()
 
 
-def get_parameters(func: Callable, /) -> Dict[str, Parameter]:
+def get_parameters(func: AnyCallable, /) -> Dict[str, Parameter]:
     return MANAGER.get_parameters(func)
 
 
-def get_arguments(func: Callable, arguments: Arguments) -> BoundArguments:
+def get_arguments(func: AnyCallable, arguments: Arguments) -> BoundArguments:
     return MANAGER.get_arguments(func, arguments)
 
 
