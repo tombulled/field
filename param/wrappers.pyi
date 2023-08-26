@@ -1,7 +1,6 @@
 from typing import Any, Mapping, Optional, Set, TypeVar, Union, overload
 
-from pydantic.fields import Undefined, UndefinedType
-
+from .sentinels import Undefined, UndefinedType
 from .typing import Supplier
 
 T = TypeVar("T")

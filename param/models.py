@@ -1,46 +1,23 @@
 import inspect
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Generic, Sequence, Tuple, TypeVar, Union
-
-from pydantic.fields import Undefined, UndefinedType
+from dataclasses import dataclass
+from typing import Any, Generic, Sequence, TypeVar
 
 from .enums import ParameterType
 from .parameters import Param
+from .sentinels import Undefined
 from .utils import parse
 
-__all__: Sequence[str] = ("Arguments", "BoundArguments", "Parameter", "Resolvable")
+__all__: Sequence[str] = ("Parameter", "Resolvable")
 
 T = TypeVar("T")
 P = TypeVar("P", bound=Param)
 
 
 @dataclass(frozen=True)
-class Arguments:
-    args: Tuple[Any, ...] = field(default_factory=tuple)
-    kwargs: Dict[str, Any] = field(default_factory=dict)
-
-    def call(self, func: Callable[..., T], /) -> T:
-        return func(*self.args, **self.kwargs)
-
-
-@dataclass(frozen=True)
-class BoundArguments:
-    args: Dict[str, Any] = field(default_factory=dict)
-    kwargs: Dict[str, Any] = field(default_factory=dict)
-
-    def call(self, func: Callable[..., T], /) -> T:
-        return func(*self.args.values(), **self.kwargs)
-
-    @property
-    def arguments(self) -> Dict[str, Any]:
-        return {**self.args, **self.kwargs}
-
-
-@dataclass(frozen=True)
 class Parameter:
     name: str
-    default: Union[Any, UndefinedType] = Undefined
-    annotation: Union[Any, UndefinedType] = Undefined
+    default: Any = Undefined
+    annotation: Any = Undefined
     type: ParameterType = ParameterType.POSITIONAL_OR_KEYWORD
 
     @classmethod
@@ -57,4 +34,4 @@ class Parameter:
 class Resolvable(Generic[P]):
     parameter: Parameter
     field: P
-    argument: Union[Any, UndefinedType] = Undefined
+    argument: Any = Undefined
