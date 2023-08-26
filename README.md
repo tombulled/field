@@ -2,6 +2,11 @@
 Enhanced function parameters
 
 ## Installation
+### PyPI
+```console
+pip install tombulled-param
+```
+### GitHub
 ```console
 pip install git+https://github.com/tombulled/param.git@main
 ```
