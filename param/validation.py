@@ -8,6 +8,7 @@ from typing import (
     List,
     Mapping,
     Optional,
+    Sequence,
     Tuple,
     Type,
     TypeVar,
@@ -21,6 +22,8 @@ from pydantic.main import BaseModel, create_model
 from pydantic.typing import get_all_type_hints
 from pydantic.utils import to_camel
 from typing_extensions import ParamSpec
+
+__all__: Sequence[str] = ("validate", "ValidatedFunction")
 
 PS = ParamSpec("PS")
 RT = TypeVar("RT")
@@ -69,7 +72,7 @@ class ValidatedFunction(Generic[PS, RT]):
     def __init__(
         self, function: Callable[PS, RT], /, *, config: Optional[ConfigType] = None
     ):
-        self.function = function  #  type: ignore
+        self.function = function
 
         parameters: Mapping[str, Parameter] = self.signature.parameters
         type_hints: Dict[str, Any] = get_all_type_hints(function)

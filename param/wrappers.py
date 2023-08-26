@@ -1,9 +1,19 @@
-from typing import Any, Mapping, Optional, Set, Union
+from typing import Any, Mapping, Optional, Sequence, Set, TypeVar, Union
 
 from pydantic.fields import Undefined
 
 from . import parameters
 from .typing import Supplier
+
+__all__: Sequence[str] = ("Param",)
+
+P = TypeVar("P", bound=parameters.Param)
+
+
+def _validate(parameter: P, /) -> P:
+    parameter._validate()
+
+    return parameter
 
 
 def Param(
@@ -34,34 +44,32 @@ def Param(
     discriminator: Optional[str] = None,
     repr: bool = True,
 ) -> parameters.Param:
-    param: parameters.Param = parameters.Param(
-        default,
-        default_factory=default_factory,
-        alias=alias,
-        title=title,
-        description=description,
-        exclude=exclude,
-        include=include,
-        const=const,
-        gt=gt,
-        ge=ge,
-        lt=lt,
-        le=le,
-        multiple_of=multiple_of,
-        allow_inf_nan=allow_inf_nan,
-        max_digits=max_digits,
-        decimal_places=decimal_places,
-        min_items=min_items,
-        max_items=max_items,
-        unique_items=unique_items,
-        min_length=min_length,
-        max_length=max_length,
-        allow_mutation=allow_mutation,
-        regex=regex,
-        discriminator=discriminator,
-        repr=repr,
+    return _validate(
+        parameters.Param(
+            default,
+            default_factory=default_factory,
+            alias=alias,
+            title=title,
+            description=description,
+            exclude=exclude,
+            include=include,
+            const=const,
+            gt=gt,
+            ge=ge,
+            lt=lt,
+            le=le,
+            multiple_of=multiple_of,
+            allow_inf_nan=allow_inf_nan,
+            max_digits=max_digits,
+            decimal_places=decimal_places,
+            min_items=min_items,
+            max_items=max_items,
+            unique_items=unique_items,
+            min_length=min_length,
+            max_length=max_length,
+            allow_mutation=allow_mutation,
+            regex=regex,
+            discriminator=discriminator,
+            repr=repr,
+        )
     )
-
-    param._validate()
-
-    return param

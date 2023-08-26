@@ -1,8 +1,12 @@
-from typing import Protocol, TypeVar
+from typing import Any, Callable, Protocol, Sequence, TypeVar
+
+__all__: Sequence[str] = ("AnyCallable", "Supplier", "Consumer", "Function")
 
 T_contra = TypeVar("T_contra", contravariant=True)
 T_co = TypeVar("T_co", covariant=True)
 R_co = TypeVar("R_co", covariant=True)
+
+AnyCallable = Callable[..., Any]
 
 
 class Supplier(Protocol[T_co]):
