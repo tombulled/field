@@ -8,6 +8,7 @@ from typing import (
     List,
     Mapping,
     Optional,
+    Sequence,
     Tuple,
     Type,
     TypeVar,
@@ -21,6 +22,8 @@ from pydantic.main import BaseModel, create_model
 from pydantic.typing import get_all_type_hints
 from pydantic.utils import to_camel
 from typing_extensions import ParamSpec
+
+__all__: Sequence[str] = ("validate", "ValidatedFunction")
 
 PS = ParamSpec("PS")
 RT = TypeVar("RT")

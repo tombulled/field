@@ -1,9 +1,11 @@
 from dataclasses import dataclass, field
-from typing import Any, Dict, Mapping, Optional, Set, Union
+from typing import Any, Dict, Mapping, Optional, Sequence, Set, Union
 
 from pydantic.fields import FieldInfo, Undefined, UndefinedType
 
 from .typing import Supplier
+
+__all__: Sequence[str] = ("Param",)
 
 
 @dataclass(frozen=True)

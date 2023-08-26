@@ -1,5 +1,8 @@
 from enum import Enum, auto
 from inspect import _ParameterKind as ParameterKind
+from typing import Sequence
+
+__all__: Sequence[str] = ("ParameterType",)
 
 
 class NoValue(Enum):
