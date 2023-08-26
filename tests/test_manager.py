@@ -2,11 +2,12 @@ from typing import Any, Callable, Dict
 
 from pydantic.fields import Undefined
 from pytest import fixture
+from arguments import Arguments, BoundArguments
 
 from param import Param, manager, parameters, params
 from param.api import MANAGER, get_arguments, get_parameters
 from param.enums import ParameterType
-from param.models import Arguments, BoundArguments, Parameter, Resolvable
+from param.models import Parameter, Resolvable
 from param.wrappers import Param
 
 
