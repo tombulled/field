@@ -1,12 +1,12 @@
 import inspect
 from dataclasses import dataclass
-from typing import Any, Generic, Sequence, TypeVar
+from typing import Any, Generic, Sequence, TypeVar, Union
 
 from arguments import Arguments, BoundArguments
 
 from .enums import ParameterType
 from .parameters import Param
-from .sentinels import Undefined
+from .sentinels import Undefined, UndefinedType
 from .utils import parse
 
 __all__: Sequence[str] = (
@@ -25,8 +25,8 @@ P = TypeVar("P", bound=Param)
 @dataclass(frozen=True)
 class Parameter:
     name: str
-    default: Any = Undefined
-    annotation: Any = Undefined
+    default: Union[Any, UndefinedType] = Undefined
+    annotation: Union[Any, UndefinedType] = Undefined
     type: ParameterType = ParameterType.POSITIONAL_OR_KEYWORD
 
     @classmethod
@@ -43,4 +43,4 @@ class Parameter:
 class Resolvable(Generic[P]):
     parameter: Parameter
     field: P
-    argument: Any = Undefined
+    argument: Union[Any, UndefinedType] = Undefined
