@@ -105,11 +105,6 @@ class ParameterManager(Generic[R]):
         bound_arguments: BoundArguments = arguments.bind(func)
         resolved_arguments: Mapping[str, Any] = self.resolve_all(resolvables.values())
 
-        print(repr(bound_arguments))
-        print()
-        print(bound_arguments.args)
-        print(bound_arguments.kwargs)
-
         args: MutableMapping[str, Any] = {}
         kwargs: MutableMapping[str, Any] = {}
 
@@ -122,8 +117,6 @@ class ParameterManager(Generic[R]):
             else:
                 destination = args
 
-            print(f"Parameter {parameter.name!r}, destination: {destination!r}")
-
             argument: Any
 
             if parameter.name in resolvables:
@@ -132,8 +125,6 @@ class ParameterManager(Generic[R]):
                 argument = bound_arguments.get(parameter.name)
 
             destination[parameter.name] = argument
-
-        print(args, kwargs, func)
 
         return Arguments(*args.values(), **kwargs).bind(func)
 
