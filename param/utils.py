@@ -1,7 +1,7 @@
 import inspect
 from typing import Any, Sequence, Union
 
-from pydantic.fields import Undefined, UndefinedType
+from .sentinels import Undefined, UndefinedType
 
 __all__: Sequence[str] = ("parse",)
 

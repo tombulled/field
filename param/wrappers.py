@@ -1,8 +1,7 @@
 from typing import Any, Mapping, Optional, Sequence, Set, TypeVar, Union
 
-from pydantic.fields import Undefined
-
 from . import parameters
+from .sentinels import Undefined
 from .typing import Supplier
 
 __all__: Sequence[str] = ("Param",)

@@ -1,39 +1,25 @@
 import inspect
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, Generic, Sequence, Tuple, TypeVar, Union
+from dataclasses import dataclass
+from typing import Any, Generic, Sequence, TypeVar, Union
 
-from pydantic.fields import Undefined, UndefinedType
+from arguments import Arguments, BoundArguments
 
 from .enums import ParameterType
 from .parameters import Param
+from .sentinels import Undefined, UndefinedType
 from .utils import parse
 
-__all__: Sequence[str] = ("Arguments", "BoundArguments", "Parameter", "Resolvable")
+__all__: Sequence[str] = (
+    # arguments
+    "Arguments",
+    "BoundArguments",
+    # param
+    "Parameter",
+    "Resolvable",
+)
 
 T = TypeVar("T")
 P = TypeVar("P", bound=Param)
-
-
-@dataclass(frozen=True)
-class Arguments:
-    args: Tuple[Any, ...] = field(default_factory=tuple)
-    kwargs: Dict[str, Any] = field(default_factory=dict)
-
-    def call(self, func: Callable[..., T], /) -> T:
-        return func(*self.args, **self.kwargs)
-
-
-@dataclass(frozen=True)
-class BoundArguments:
-    args: Dict[str, Any] = field(default_factory=dict)
-    kwargs: Dict[str, Any] = field(default_factory=dict)
-
-    def call(self, func: Callable[..., T], /) -> T:
-        return func(*self.args.values(), **self.kwargs)
-
-    @property
-    def arguments(self) -> Dict[str, Any]:
-        return {**self.args, **self.kwargs}
 
 
 @dataclass(frozen=True)

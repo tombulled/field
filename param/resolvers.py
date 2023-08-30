@@ -1,10 +1,10 @@
 from typing import Any, Protocol, Sequence, Type, TypeVar, Union
 
-from pydantic.fields import Undefined, UndefinedType
 from roster import Register
 
 from .errors import ResolutionError
 from .parameters import Param
+from .sentinels import Undefined, UndefinedType
 
 __all__: Sequence[str] = ("Resolver", "Resolvers", "RESOLVERS", "resolve_param")
 

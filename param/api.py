@@ -1,4 +1,4 @@
-from typing import Callable, Dict, Sequence, TypeVar
+from typing import Callable, Mapping, Sequence, TypeVar
 
 from typing_extensions import ParamSpec
 
@@ -14,7 +14,7 @@ RT = TypeVar("RT")
 MANAGER: ParameterManager = ParamManager()
 
 
-def get_parameters(func: AnyCallable, /) -> Dict[str, Parameter]:
+def get_parameters(func: AnyCallable, /) -> Mapping[str, Parameter]:
     return MANAGER.get_parameters(func)
 
 

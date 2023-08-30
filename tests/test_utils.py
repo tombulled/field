@@ -1,8 +1,7 @@
 from inspect import Parameter
 
-from pydantic.fields import Undefined
-
 from param import utils
+from param.sentinels import Undefined
 
 
 def test_parse():
