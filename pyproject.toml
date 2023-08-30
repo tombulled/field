@@ -38,4 +38,4 @@ warn_unused_configs = true
 warn_unused_ignores = true
 
 [tool.pytest.ini_options]
-testpaths = "tests"
+testpaths = "tests/"
