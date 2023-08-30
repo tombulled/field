@@ -15,11 +15,10 @@ from typing import (
     TypeVar,
 )
 
-from arguments import Arguments, BoundArguments
 from typing_extensions import ParamSpec
 
 from .errors import ResolutionError
-from .models import Parameter, Resolvable
+from .models import Arguments, BoundArguments, Parameter, Resolvable
 from .parameters import Param
 from .resolvers import RESOLVERS, Resolver, Resolvers
 from .sentinels import Undefined
@@ -31,21 +30,6 @@ PS = ParamSpec("PS")
 RT = TypeVar("RT")
 
 R = TypeVar("R", bound=AnyCallable)
-
-
-def _bind_arguments(func: AnyCallable, arguments: Arguments) -> BoundArguments:
-    signature: inspect.Signature = inspect.signature(func)
-
-    bound_arguments: inspect.BoundArguments = arguments.call(signature.bind)
-
-    bound_arguments.apply_defaults()
-
-    bound_args: Mapping[str, Any] = dict(
-        zip(signature.parameters, bound_arguments.args)
-    )
-    bound_kwargs: Mapping[str, Any] = bound_arguments.kwargs
-
-    return BoundArguments(args=bound_args, kwargs=bound_kwargs)
 
 
 @dataclass
@@ -89,13 +73,13 @@ class ParameterManager(Generic[R]):
     def get_resolvables(
         self, func: AnyCallable, arguments: Arguments, /
     ) -> Mapping[str, Resolvable]:
-        bound_arguments: BoundArguments = _bind_arguments(func, arguments)
+        bound_arguments: BoundArguments = arguments.bind(func)
         parameters: Mapping[str, Parameter] = self.get_parameters(func)
         resolvables: MutableMapping[str, Resolvable] = {}
 
         parameter_name: str
         argument: Any
-        for parameter_name, argument in bound_arguments.arguments.items():
+        for parameter_name, argument in bound_arguments.asdict().items():
             parameter: Parameter = parameters[parameter_name]
             specification: Optional[Param] = self.get_param(parameter)
 
@@ -118,8 +102,13 @@ class ParameterManager(Generic[R]):
     def get_arguments(self, func: Callable, arguments: Arguments) -> BoundArguments:
         resolvables: Mapping[str, Resolvable] = self.get_resolvables(func, arguments)
         parameters: Mapping[str, Parameter] = self.get_parameters(func)
-        bound_arguments: BoundArguments = _bind_arguments(func, arguments)
+        bound_arguments: BoundArguments = arguments.bind(func)
         resolved_arguments: Mapping[str, Any] = self.resolve_all(resolvables.values())
+
+        print(repr(bound_arguments))
+        print()
+        print(bound_arguments.args)
+        print(bound_arguments.kwargs)
 
         args: MutableMapping[str, Any] = {}
         kwargs: MutableMapping[str, Any] = {}
@@ -128,26 +117,30 @@ class ParameterManager(Generic[R]):
         for parameter in parameters.values():
             destination: MutableMapping[str, Any]
 
-            if parameter.name in bound_arguments.args:
-                destination = args
-            else:
+            if parameter.name in bound_arguments.kwargs:
                 destination = kwargs
+            else:
+                destination = args
+
+            print(f"Parameter {parameter.name!r}, destination: {destination!r}")
 
             argument: Any
 
             if parameter.name in resolvables:
                 argument = resolved_arguments[parameter.name]
             else:
-                argument = bound_arguments.arguments[parameter.name]
+                argument = bound_arguments.get(parameter.name)
 
             destination[parameter.name] = argument
 
-        return BoundArguments(args=args, kwargs=kwargs)
+        print(args, kwargs, func)
+
+        return Arguments(*args.values(), **kwargs).bind(func)
 
     def params(self, func: Callable[PS, RT], /) -> Callable[PS, RT]:
         @functools.wraps(func)
         def wrapper(*args: PS.args, **kwargs: PS.kwargs) -> RT:
-            arguments: Arguments = Arguments(args=args, kwargs=kwargs)
+            arguments: Arguments = Arguments(*args, **kwargs)
 
             bound_arguments: BoundArguments = self.get_arguments(func, arguments)
 

@@ -1,10 +1,9 @@
 from typing import Callable, Mapping, Sequence, TypeVar
 
-from arguments import Arguments, BoundArguments
 from typing_extensions import ParamSpec
 
 from .manager import ParameterManager, ParamManager
-from .models import Parameter
+from .models import Arguments, BoundArguments, Parameter
 from .typing import AnyCallable
 
 __all__: Sequence[str] = ("get_parameters", "get_arguments", "params")
