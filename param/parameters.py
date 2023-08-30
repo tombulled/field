@@ -3,7 +3,7 @@ from typing import Any, Dict, Mapping, Optional, Sequence, Set, Union
 
 from pydantic.fields import FieldInfo
 
-from .sentinels import Undefined
+from .sentinels import Undefined, UndefinedType
 from .typing import Supplier
 
 __all__: Sequence[str] = ("Param",)
@@ -11,7 +11,7 @@ __all__: Sequence[str] = ("Param",)
 
 @dataclass(frozen=True)
 class Param(FieldInfo):
-    default: Any = Undefined
+    default: Union[Any, UndefinedType] = Undefined
     default_factory: Optional[Supplier[Any]] = None
     alias: Optional[str] = None
     title: Optional[str] = None
