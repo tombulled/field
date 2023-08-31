@@ -1,12 +1,12 @@
 import inspect
-from typing import Any, Sequence, Union
+from typing import Any, Sequence
 
-from .sentinels import Undefined, UndefinedType
+from .sentinels import Undefined
 
-__all__: Sequence[str] = ("parse",)
+__all__: Sequence[str] = ("parse_parameter_value",)
 
 
-def parse(value: Any, /) -> Union[Any, UndefinedType]:
+def parse_parameter_value(value: Any, /) -> Any:
     if value is inspect.Parameter.empty:
         return Undefined
     else:

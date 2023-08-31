@@ -3,11 +3,11 @@ from dataclasses import dataclass
 from typing import Any, Generic, Sequence, TypeVar, Union
 
 from arguments import Arguments, BoundArguments
+from pydantic.fields import FieldInfo
 
 from .enums import ParameterType
-from .parameters import Param
 from .sentinels import Undefined, UndefinedType
-from .utils import parse
+from .utils import parse_parameter_value
 
 __all__: Sequence[str] = (
     # arguments
@@ -19,7 +19,7 @@ __all__: Sequence[str] = (
 )
 
 T = TypeVar("T")
-P = TypeVar("P", bound=Param)
+F = TypeVar("F", bound=FieldInfo)
 
 
 @dataclass(frozen=True)
@@ -33,14 +33,14 @@ class Parameter:
     def from_parameter(cls, parameter: inspect.Parameter, /) -> "Parameter":
         return cls(
             name=parameter.name,
-            default=parse(parameter.default),
-            annotation=parse(parameter.annotation),
-            type=ParameterType.from_kind(parameter.kind),
+            default=parse_parameter_value(parameter.default),
+            annotation=parse_parameter_value(parameter.annotation),
+            type=ParameterType(parameter.kind),
         )
 
 
 @dataclass(frozen=True)
-class Resolvable(Generic[P]):
+class Resolvable(Generic[F]):
     parameter: Parameter
-    field: P
+    field: F
     argument: Union[Any, UndefinedType] = Undefined

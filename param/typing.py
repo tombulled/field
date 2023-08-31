@@ -1,6 +1,11 @@
 from typing import Any, Callable, Protocol, Sequence, TypeVar
 
-__all__: Sequence[str] = ("AnyCallable", "Supplier", "Consumer", "Function")
+__all__: Sequence[str] = (
+    "AnyCallable",
+    "Supplier",
+    "Consumer",
+    "Function",
+)
 
 T_contra = TypeVar("T_contra", contravariant=True)
 T_co = TypeVar("T_co", covariant=True)

@@ -1,5 +1,5 @@
-from enum import Enum, auto
-from inspect import _ParameterKind as ParameterKind
+from enum import Enum
+from inspect import Parameter
 from typing import Sequence
 
 __all__: Sequence[str] = ("ParameterType",)
@@ -11,12 +11,12 @@ class NoValue(Enum):
 
 
 class ParameterType(NoValue):
-    POSITIONAL_ONLY = auto()
-    POSITIONAL_OR_KEYWORD = auto()
-    VAR_POSITIONAL = auto()
-    KEYWORD_ONLY = auto()
-    VAR_KEYWORD = auto()
+    POSITIONAL_ONLY = Parameter.POSITIONAL_ONLY
+    POSITIONAL_OR_KEYWORD = Parameter.POSITIONAL_OR_KEYWORD
+    VAR_POSITIONAL = Parameter.VAR_POSITIONAL
+    KEYWORD_ONLY = Parameter.KEYWORD_ONLY
+    VAR_KEYWORD = Parameter.VAR_KEYWORD
 
-    @classmethod
-    def from_kind(cls, kind: ParameterKind, /) -> "ParameterType":
-        return getattr(cls, kind.name)
+    @property
+    def description(self) -> str:
+        return self.value.description

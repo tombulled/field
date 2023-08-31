@@ -1,34 +1,37 @@
 from typing import Any, Protocol, Sequence, Type, TypeVar, Union
 
 from roster import Register
+from pydantic.fields import FieldInfo
 
 from .errors import ResolutionError
-from .parameters import Param
 from .sentinels import Undefined, UndefinedType
 
 __all__: Sequence[str] = ("Resolver", "Resolvers", "RESOLVERS", "resolve_param")
 
 
 class Resolver(Protocol):
-    def __call__(self, param: Param, argument: Union[Any, UndefinedType]) -> Any:
+    def __call__(self, param: FieldInfo, argument: Union[Any, UndefinedType]) -> Any:
         ...
 
 
 R = TypeVar("R", bound=Resolver)
 
 
-class Resolvers(Register[Type[Param], R]):
+class Resolvers(Register[Type[FieldInfo], R]):
     pass
 
 
 RESOLVERS: Resolvers[Resolver] = Resolvers()
 
 
-@RESOLVERS(Param)
-def resolve_param(param: Param, argument: Union[Any, UndefinedType]) -> Any:
+@RESOLVERS(FieldInfo)
+def resolve_param(param: FieldInfo, argument: Any) -> Any:
     if argument is not Undefined:
         return argument
-    elif param.has_default():
-        return param.get_default()
-    else:
-        raise ResolutionError("No value provided and parameter has no default")
+
+    default: Any = param.get_default()
+
+    if default is not Undefined:
+        return default
+
+    raise ResolutionError("No value provided and parameter has no default")
