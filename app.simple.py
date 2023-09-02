@@ -6,13 +6,13 @@ from pydantic.fields import UndefinedType
 import param.parameters
 from param import (Param, Parameter, ParameterManager, Resolvable, Resolver,
                    Resolvers, params)
-from param.resolvers import resolve_param
+from param.resolvers import resolve_field_info
 
 
 @dataclass
 class ParamManager(ParameterManager[Resolver]):
     resolvers: Resolvers[Resolver] = field(
-        default_factory=lambda: Resolvers({param.parameters.Param: resolve_param})
+        default_factory=lambda: Resolvers({param.parameters.Param: resolve_field_info})
     )
 
     def resolve(self, resolvable: Resolvable) -> Any:

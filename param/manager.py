@@ -1,6 +1,5 @@
 import dataclasses
 import functools
-import inspect
 from dataclasses import dataclass, field
 from typing import (
     Any,
@@ -16,10 +15,10 @@ from typing import (
 )
 
 from typing_extensions import ParamSpec
+from pydantic.fields import FieldInfo
 
 from .errors import ResolutionError
 from .models import Arguments, BoundArguments, Parameter, Resolvable
-from .parameters import Param
 from .resolvers import RESOLVERS, Resolver, Resolvers
 from .sentinels import Undefined
 from .typing import AnyCallable
@@ -36,20 +35,13 @@ R = TypeVar("R", bound=AnyCallable)
 class ParameterManager(Generic[R]):
     resolvers: Resolvers[R]
 
-    @staticmethod
-    def get_parameters(func: AnyCallable, /) -> Mapping[str, Parameter]:
-        return {
-            parameter.name: Parameter.from_parameter(parameter)
-            for parameter in inspect.signature(func).parameters.values()
-        }
-
-    def get_param(self, parameter: Parameter, /) -> Optional[Param]:
-        if isinstance(parameter.default, Param):
+    def get_param(self, parameter: Parameter, /) -> Optional[FieldInfo]:
+        if isinstance(parameter.default, FieldInfo):
             return parameter.default
         else:
             return None
 
-    def get_resolver(self, param_cls: Type[Param], /) -> R:
+    def get_resolver(self, param_cls: Type[FieldInfo], /) -> R:
         resolver: Optional[R] = self.resolvers.get(param_cls)
 
         if resolver is not None:
@@ -81,7 +73,7 @@ class ParameterManager(Generic[R]):
         argument: Any
         for parameter_name, argument in bound_arguments.asdict().items():
             parameter: Parameter = parameters[parameter_name]
-            specification: Optional[Param] = self.get_param(parameter)
+            specification: Optional[FieldInfo] = self.get_param(parameter)
 
             if specification is None:
                 continue
@@ -144,19 +136,19 @@ class ParameterManager(Generic[R]):
 class ParamManager(ParameterManager[Resolver]):
     resolvers: Resolvers[Resolver] = field(default_factory=lambda: RESOLVERS)
 
-    def get_param(self, parameter: Parameter, /) -> Param:
-        specification: Optional[Param] = super().get_param(parameter)
+    def get_param(self, parameter: Parameter, /) -> FieldInfo:
+        specification: Optional[FieldInfo] = super().get_param(parameter)
 
         if specification is not None:
             return specification
         else:
-            return Param(default=parameter.default)
+            return FieldInfo(default=parameter.default)
 
     def resolve(
         self,
         resolvable: Resolvable,
     ) -> Any:
-        resolver_cls: Type[Param] = type(resolvable.field)
+        resolver_cls: Type[FieldInfo] = type(resolvable.field)
         resolver: Resolver = self.get_resolver(resolver_cls)
 
         return resolver(resolvable.field, resolvable.argument)
@@ -172,12 +164,10 @@ class ParamManager(ParameterManager[Resolver]):
             super().get_resolvables(func, arguments).items()
         ):
             parameter: Parameter = resolvable.parameter
-            field: Param = resolvable.field
+            field: FieldInfo = resolvable.field
 
             if field.alias is None:
-                field = dataclasses.replace(
-                    field, alias=field.generate_alias(parameter.name)
-                )
+                field = field.merge_field_infos(alias=field.generate_alias(parameter.name))
 
                 resolvable = dataclasses.replace(resolvable, field=field)
 

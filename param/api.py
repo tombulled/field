@@ -1,3 +1,4 @@
+import inspect
 from typing import Callable, Mapping, Sequence, TypeVar
 
 from typing_extensions import ParamSpec
@@ -15,7 +16,10 @@ MANAGER: ParameterManager = ParamManager()
 
 
 def get_parameters(func: AnyCallable, /) -> Mapping[str, Parameter]:
-    return MANAGER.get_parameters(func)
+    return {
+        parameter.name: Parameter.from_parameter(parameter)
+        for parameter in inspect.signature(func).parameters.values()
+    }
 
 
 def get_arguments(func: AnyCallable, arguments: Arguments) -> BoundArguments:

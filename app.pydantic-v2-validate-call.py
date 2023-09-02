@@ -5,6 +5,7 @@ from typing_extensions import ParamSpec
 from arguments import Arguments
 
 from pydantic import Field, validate_call
+from pydantic._internal._validate_call import ValidateCallWrapper
 from typing_extensions import Annotated
 
 """
