@@ -1,11 +1,14 @@
-from typing import Any, Callable, Sequence, Union
+from typing import Any, Sequence, TypeVar, Union
+from typing_extensions import TypeAlias
 
-from .sentinels import UndefinedType
+from .sentinels import MissingType
 
-__all__: Sequence[str] = (
-    "AnyCallable",
-    "AnyOrUndefined",
-)
+__all__: Sequence[str] = ("Argument",)
 
-AnyCallable = Callable[..., Any]
-AnyOrUndefined = Union[Any, UndefinedType]
+T = TypeVar("T")
+
+Maybe = Union[T, MissingType]
+
+AnyOrMissing = Maybe[Any]
+
+Argument: TypeAlias = AnyOrMissing

@@ -6,6 +6,7 @@ from typing import (
     Sequence,
     Type,
     TypeVar,
+    runtime_checkable,
 )
 
 from pydantic.fields import FieldInfo
@@ -25,6 +26,7 @@ M = TypeVar("M")
 M_cont = TypeVar("M_cont", contravariant=True)
 
 
+@runtime_checkable
 class Resolver(Protocol[M_cont]):
     def __call__(self, metadata: M_cont, argument: AnyOrUndefined) -> Any:
         ...
