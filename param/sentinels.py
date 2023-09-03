@@ -1,12 +1,14 @@
-from enum import Enum, auto
+from enum import auto
 from typing import Literal, Sequence
 
 from typing_extensions import TypeAlias
 
+from .enums import NoValue
+
 __all__: Sequence[str] = ("MissingType", "Missing")
 
 
-class Sentinel(Enum):
+class Sentinel(NoValue):
     MISSING = auto()
 
 

@@ -7,11 +7,14 @@ from param.validation import ValidatedFunction
 def greet(name: Annotated[str, Field(...)], message: str = Field(default="hello")):
     print(message, name)
 
-def say(message = Field(...)):
+
+def say(message=Field(...)):
     print(message)
 
-def say2(message = Field(default_factory=dict)):
+
+def say2(message=Field(default_factory=dict)):
     print(message)
+
 
 vf = ValidatedFunction(greet)
 vfs = ValidatedFunction(say)

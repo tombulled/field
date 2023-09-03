@@ -1,6 +1,6 @@
-from typing_extensions import Annotated
 from pydantic import Field
 from pydantic.fields import FieldInfo
+from typing_extensions import Annotated
 
 from param.enums import ParameterType
 

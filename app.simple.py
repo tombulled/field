@@ -4,8 +4,15 @@ from typing import Any
 from pydantic.fields import UndefinedType
 
 import param.parameters
-from param import (Param, Parameter, ParameterManager, Resolvable, Resolver,
-                   Resolvers, params)
+from param import (
+    Param,
+    Parameter,
+    ParameterManager,
+    Resolvable,
+    Resolver,
+    Resolvers,
+    params,
+)
 from param.resolvers import resolve_field_info
 
 

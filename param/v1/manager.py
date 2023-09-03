@@ -14,8 +14,8 @@ from typing import (
     TypeVar,
 )
 
-from typing_extensions import ParamSpec
 from pydantic.fields import FieldInfo
+from typing_extensions import ParamSpec
 
 from .errors import ResolutionError
 from .models import Arguments, BoundArguments, Parameter, Resolvable
@@ -167,7 +167,9 @@ class ParamManager(ParameterManager[Resolver]):
             field: FieldInfo = resolvable.field
 
             if field.alias is None:
-                field = field.merge_field_infos(alias=field.generate_alias(parameter.name))
+                field = field.merge_field_infos(
+                    alias=field.generate_alias(parameter.name)
+                )
 
                 resolvable = dataclasses.replace(resolvable, field=field)
 

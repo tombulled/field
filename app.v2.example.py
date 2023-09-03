@@ -1,5 +1,6 @@
 from abc import abstractmethod
 from typing import Any, TypeVar
+
 from typing_extensions import Annotated
 
 from param import params
