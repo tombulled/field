@@ -13,10 +13,7 @@ __all__: Sequence[str] = (
 
 T = TypeVar("T")
 
-AnyCallable = Callable[..., Any]
-
 Maybe = Union[T, MissingType]
-
+AnyCallable = Callable[..., Any]
 AnyOrMissing = Maybe[Any]
-
 Argument: TypeAlias = AnyOrMissing

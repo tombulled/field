@@ -3,11 +3,10 @@ from dataclasses import dataclass
 from typing import Any, Generic, Sequence, TypeVar
 
 from arguments import Arguments, BoundArguments
-from pydantic.fields import FieldInfo
 
 from .enums import ParameterType
 from .sentinels import Missing
-from .typing import AnyOrMissing
+from .typing import AnyCallable, AnyOrMissing, Argument
 from .utils import parse_parameter_value
 
 __all__: Sequence[str] = (
@@ -17,10 +16,10 @@ __all__: Sequence[str] = (
     # param
     "Parameter",
     "Resolvable",
+    "ResolutionContext",
 )
 
-T = TypeVar("T")
-F = TypeVar("F", bound=FieldInfo)
+M = TypeVar("M")
 
 
 @dataclass(frozen=True)
@@ -44,4 +43,11 @@ class Parameter:
 class Resolvable:
     parameter: Parameter
     metadata: Sequence[Any]
-    argument: AnyOrMissing = Missing
+    argument: Argument = Missing
+
+
+@dataclass(frozen=True)
+class ResolutionContext(Generic[M]):
+    callable: AnyCallable
+    parameter: Parameter
+    metadata: M

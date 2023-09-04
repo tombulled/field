@@ -3,7 +3,7 @@ from dataclasses import dataclass
 from typing_extensions import Annotated
 
 from param import Missing, Params
-from param.models import Arguments
+from param.models import Arguments, ResolutionContext
 from param.typing import Argument
 
 params: Params = Params()
@@ -22,7 +22,7 @@ EXCLAIM: Punctuate = Punctuate("!")
 
 
 @params.resolver(Upper)
-def resolve_upper(_: Upper, argument: Argument) -> str:
+def resolve_upper(_, argument: Argument) -> str:
     if argument is Missing or not isinstance(argument, str):
         raise Exception
 
@@ -30,11 +30,11 @@ def resolve_upper(_: Upper, argument: Argument) -> str:
 
 
 @params.resolver(Punctuate)
-def resolve_punctuate(metadata: Punctuate, argument: Argument) -> str:
+def resolve_punctuate(ctx: ResolutionContext[Punctuate], argument: Argument) -> str:
     if argument is Missing or not isinstance(argument, str):
         raise Exception
 
-    return argument + metadata.punctation
+    return argument + ctx.metadata.punctation
 
 
 Name = Annotated[str, Upper(), EXCLAIM]

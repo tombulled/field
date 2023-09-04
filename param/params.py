@@ -16,7 +16,7 @@ from typing_extensions import ParamSpec, TypeAlias
 
 from . import api, utils
 from .errors import ResolutionError
-from .models import Parameter, Resolvable
+from .models import Parameter, Resolvable, ResolutionContext
 from .resolver import Resolver
 from .typing import AnyCallable
 
@@ -47,9 +47,9 @@ class Params:
         def wrapper(*args: PS.args, **kwargs: PS.kwargs) -> RT:
             arguments: Arguments = Arguments(*args, **kwargs)
 
-            print(f"Arguments: {arguments!r}")
+            bound_arguments: BoundArguments = self.get_arguments(func, arguments)
 
-            raise NotImplementedError
+            return bound_arguments.call(func)
 
         return wrapper
 
@@ -99,6 +99,7 @@ class Params:
 
     def resolve(
         self,
+        func: AnyCallable,
         resolvable: Resolvable,
     ) -> Any:
         argument: Any = resolvable.argument
@@ -108,17 +109,24 @@ class Params:
             metadata_cls: type = type(metadata)
             resolver: Resolver = self.get_resolver(metadata_cls)
 
-            argument = resolver(metadata, argument)
+            resolution_context: ResolutionContext[Any] = ResolutionContext(
+                callable=func,
+                parameter=resolvable.parameter,
+                metadata=metadata,
+            )
+
+            argument = resolver(resolution_context, argument)
 
         return argument
 
     def resolve_all(
         self,
+        func: AnyCallable,
         resolvables: Iterable[Resolvable],
         /,
     ) -> Mapping[str, Any]:
         return {
-            resolvable.parameter.name: self.resolve(resolvable)
+            resolvable.parameter.name: self.resolve(func, resolvable)
             for resolvable in resolvables
         }
 
@@ -134,7 +142,7 @@ class Params:
         resolvables: Mapping[str, Resolvable] = self._get_resolvables(func, arguments)
         parameters: Mapping[str, Parameter] = api.get_parameters(func)
         bound_arguments: BoundArguments = arguments.bind(func)
-        resolved_arguments: Mapping[str, Any] = self.resolve_all(resolvables.values())
+        resolved_arguments: Mapping[str, Any] = self.resolve_all(func, resolvables.values())
 
         args: MutableMapping[str, Any] = {}
         kwargs: MutableMapping[str, Any] = {}
