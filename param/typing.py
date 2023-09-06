@@ -4,12 +4,12 @@ from .sentinels import MissingType
 
 __all__: Sequence[str] = (
     "AnyCallable",
-    "Maybe",
     "AnyOrMissing",
 )
 
 T = TypeVar("T")
 
-Maybe = Union[T, MissingType]
+OrMissing = Union[T, MissingType]
+
 AnyCallable = Callable[..., Any]
-AnyOrMissing = Maybe[Any]
+AnyOrMissing = OrMissing[Any]

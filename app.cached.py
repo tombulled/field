@@ -10,7 +10,7 @@ from param.parameters import Param as ParamModel
 from param.parameters import ParameterSpecification
 from param.resolvers import Resolvers
 from param.sentinels import Missing, MissingType
-from param.utils import parse_parameter_value
+from param.utils import empty_to_missing
 
 """
 * Support the scenario where need to resolve multiple at once (e.g. Body)

@@ -4,15 +4,14 @@ from typing import Any, Sequence
 from .sentinels import Missing
 from .typing import AnyOrMissing
 
-__all__: Sequence[str] = ("parse_parameter_value", "get_metadata", "is_annotated")
+__all__: Sequence[str] = ("empty_to_missing", "get_metadata", "is_annotated")
 
 
-# NOTE: Not just the parameter value, could also be the return type
-def parse_parameter_value(value: Any, /) -> AnyOrMissing:
+def empty_to_missing(value: Any, /) -> AnyOrMissing:
     if value is inspect.Parameter.empty:
         return Missing
-    else:
-        return value
+
+    return value
 
 
 def get_metadata(typ: Any, /) -> Sequence[Any]:

@@ -1,13 +1,13 @@
 import inspect
 from dataclasses import dataclass
-from typing import Any, Sequence, TypeVar
+from typing import Sequence, TypeVar
 
 from arguments import Arguments, BoundArguments
 
 from .enums import ParameterType
 from .sentinels import Missing
 from .typing import AnyOrMissing
-from .utils import parse_parameter_value
+from .utils import empty_to_missing
 
 __all__: Sequence[str] = (
     # arguments
@@ -15,7 +15,6 @@ __all__: Sequence[str] = (
     "BoundArguments",
     # param
     "Parameter",
-    "Resolvable",
 )
 
 M = TypeVar("M")
@@ -32,14 +31,7 @@ class Parameter:
     def from_parameter(cls, parameter: inspect.Parameter, /) -> "Parameter":
         return cls(
             name=parameter.name,
-            default=parse_parameter_value(parameter.default),
-            annotation=parse_parameter_value(parameter.annotation),
+            default=empty_to_missing(parameter.default),
+            annotation=empty_to_missing(parameter.annotation),
             type=ParameterType(parameter.kind),
         )
-
-
-@dataclass(frozen=True)
-class Resolvable:
-    parameter: Parameter
-    metadata: Sequence[Any]
-    argument: AnyOrMissing = Missing

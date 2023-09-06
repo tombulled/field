@@ -5,5 +5,5 @@ from param.sentinels import Undefined
 
 
 def test_parse():
-    assert utils.parse_parameter_value(Parameter.empty) is Undefined
-    assert utils.parse_parameter_value(123) == 123
+    assert utils.empty_to_missing(Parameter.empty) is Undefined
+    assert utils.empty_to_missing(123) == 123
