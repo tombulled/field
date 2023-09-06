@@ -1,9 +1,8 @@
 from typing_extensions import Annotated
 
-from param import Params
-from param.pydantic import Param, ParamInfo, PydanticResolver
+from param.pydantic import Param, PydanticParams
 
-params = Params({ParamInfo: PydanticResolver()})
+params = PydanticParams()
 
 Name = Annotated[str, Param()]
 

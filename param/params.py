@@ -2,9 +2,9 @@ import functools
 from typing import (
     Any,
     Callable,
+    Generic,
     MutableMapping,
     Optional,
-    Protocol,
     Sequence,
     Type,
     TypeVar,
@@ -21,21 +21,20 @@ from .typing import AnyCallable
 __all__: Sequence[str] = ("Params",)
 
 M = TypeVar("M")
-P = ParamSpec("P")
 R = TypeVar("R")
 
-
-class ResolverIdentityCallable(Protocol[M]):
-    def __call__(self, resolver: Resolver[M, R], /) -> Resolver[M, R]:
-        ...
+PS = ParamSpec("PS")
+RT = TypeVar("RT")
 
 
-class Params:
-    resolvers: MutableResolvers
+class Params(Generic[M, R]):
+    # TODO: Configure what to do if unsupported metadata found (e.g. ignore vs throw)
+    
+    resolvers: MutableResolvers[M, R]
 
     def __init__(
         self,
-        resolvers: Optional[Resolvers] = None,
+        resolvers: Optional[Resolvers[M, R]] = None,
         /,
     ) -> None:
         self.resolvers = {**resolvers} if resolvers is not None else {}
@@ -43,9 +42,9 @@ class Params:
     def __repr__(self) -> str:
         return f"{type(self).__name__}({self.resolvers!r})"
 
-    def __call__(self, func: Callable[P, R], /) -> Callable[P, R]:
+    def __call__(self, func: Callable[PS, RT], /) -> Callable[PS, RT]:
         @functools.wraps(func)
-        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+        def wrapper(*args: PS.args, **kwargs: PS.kwargs) -> RT:
             arguments: Arguments = Arguments(*args, **kwargs)
 
             resolved_arguments: Arguments = self.resolve(func, arguments)
@@ -56,7 +55,9 @@ class Params:
 
         return wrapper
 
-    def resolver(self, metadata_cls: Type[M], /) -> ResolverIdentityCallable[M]:
+    def resolver(
+        self, metadata_cls: Type[M], /
+    ) -> Callable[[Resolver[M, R]], Resolver[M, R]]:
         def wrapper(resolver: Resolver[M, R], /) -> Resolver[M, R]:
             self.resolvers[metadata_cls] = resolver
 
@@ -64,7 +65,7 @@ class Params:
 
         return wrapper
 
-    def get_resolver(self, metadata: M, /) -> Optional[Resolver[M, Any]]:
+    def get_resolver(self, metadata: M, /) -> Optional[Resolver[M, R]]:
         metadata_cls: Type[M] = type(metadata)
 
         # NOTE: For now this is naive, however, in the future, may want
@@ -74,8 +75,8 @@ class Params:
     def can_resolve(self, metadata: M, /) -> bool:
         return self.get_resolver(metadata) is not None
 
-    def resolve_metadata(self, metadata: M, argument: Any) -> Any:
-        resolver: Optional[Resolver[M, Any]] = self.get_resolver(metadata)
+    def resolve_metadata(self, metadata: M, argument: Any) -> R:
+        resolver: Optional[Resolver[M, R]] = self.get_resolver(metadata)
 
         if resolver is None:
             raise ResolutionError(
@@ -84,12 +85,15 @@ class Params:
 
         return resolver(metadata, argument)
 
-    def get_metadata(self, typ: Any, /) -> Sequence[Any]:
+    def get_metadata(self, typ: Any, /) -> Sequence[M]:
         return [
             metadata
             for metadata in utils.get_metadata(typ)
             if self.can_resolve(metadata)
         ]
+
+    def get_parameter_metadata(self, parameter: Parameter, /) -> Sequence[M]:
+        return self.get_metadata(parameter.annotation)
 
     def resolve(self, func: AnyCallable, arguments: Arguments) -> Arguments:
         bound_arguments: BoundArguments = arguments.bind(func)
@@ -100,7 +104,7 @@ class Params:
         parameter: Parameter
         for parameter in api.get_parameters(func).values():
             argument: Any = bound_arguments.get(parameter.name)
-            metadatas: Sequence[Any] = self.get_metadata(parameter.annotation)
+            metadatas: Sequence[Any] = self.get_parameter_metadata(parameter)
 
             metadata: Any
             for metadata in metadatas:
