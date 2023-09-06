@@ -10,17 +10,15 @@ from typing import (
 
 from typing_extensions import TypeAlias
 
-from .models import ResolutionContext
-
 __all__: Sequence[str] = ("Resolver", "Resolvers", "MutableResolvers")
 
-M = TypeVar("M")
+M_contra = TypeVar("M_contra", contravariant=True)
 R_co = TypeVar("R_co", covariant=True)
 
 
 @runtime_checkable
-class Resolver(Protocol[M, R_co]):
-    def __call__(self, context: ResolutionContext[M], argument: Any, /) -> R_co:
+class Resolver(Protocol[M_contra, R_co]):
+    def __call__(self, metadata: M_contra, argument: Any, /) -> R_co:
         ...
 
 

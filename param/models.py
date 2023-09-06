@@ -1,6 +1,6 @@
 import inspect
 from dataclasses import dataclass
-from typing import Any, Generic, Sequence, TypeVar
+from typing import Any, Sequence, TypeVar
 
 from arguments import Arguments, BoundArguments
 
@@ -16,7 +16,6 @@ __all__: Sequence[str] = (
     # param
     "Parameter",
     "Resolvable",
-    "ResolutionContext",
 )
 
 M = TypeVar("M")
@@ -44,15 +43,3 @@ class Resolvable:
     parameter: Parameter
     metadata: Sequence[Any]
     argument: AnyOrMissing = Missing
-
-
-@dataclass(frozen=True)
-class ResolutionContext(Generic[M]):
-    # NOTE: Here last.
-    # Surely it's only really Pydantic that has a reasonable need to inspect
-    # the parameter `name` and `annotation`, and these can be stored in `FieldInfo`
-    # by doing a first "sweep" of the params (name -> alias, annotation -> annotation)
-    # Provided this is the case, a resolver should just be (metadata: M, argument: Any) -> Any
-    name: str
-    annotation: Any
-    metadata: M

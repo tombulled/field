@@ -1,7 +1,7 @@
-from param import Params
-from param.pydantic import PydanticResolver, ParamInfo, Param
-
 from typing_extensions import Annotated
+
+from param import Params
+from param.pydantic import Param, ParamInfo, PydanticResolver
 
 params = Params({ParamInfo: PydanticResolver()})
 
