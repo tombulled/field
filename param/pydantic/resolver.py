@@ -5,6 +5,8 @@ from pydantic import ConfigDict, RootModel
 from pydantic.fields import FieldInfo
 from typing_extensions import Annotated
 
+from pydantic_core import PydanticUndefined
+
 from ..resolver import Resolver
 
 __all__: Sequence[str] = ("PydanticResolver",)
@@ -14,25 +16,19 @@ __all__: Sequence[str] = ("PydanticResolver",)
 class PydanticResolver(Resolver[FieldInfo, Any]):
     config: Optional[ConfigDict] = None
 
-    def __call__(
-        self, field_info: FieldInfo, argument: Any, /
-    ) -> Any:
-        raise NotImplementedError
-        # annotation: Any = parameter.annotation
+    def __call__(self, field_info: FieldInfo, argument: Any, /) -> Any:
+        annotation: Any = field_info.annotation
 
-        # if annotation is Missing:
-        #     annotation = Any
+        if annotation is None:
+            annotation = Any
 
-        # field_info: FieldInfo
+        if field_info.default is PydanticUndefined:
+            field_info = FieldInfo.from_annotation(annotation)
+        else:
+            field_info = FieldInfo.from_annotated_attribute(
+                annotation, field_info.default
+            )
 
-        # if context.parameter.default is Missing:
-        #     field_info = FieldInfo.from_annotation(annotation)
-        # else:
-        #     field_info = FieldInfo.from_annotated_attribute(
-        #         annotation, context.parameter.default
-        #     )
+        root_model = RootModel[Annotated[annotation, field_info]]
 
-        # # WARN: This will end up with 2x FieldInfos in the metadata
-        # root_model = RootModel[Annotated[annotation, field_info]]
-
-        # return root_model(argument).root
+        return root_model(argument).root

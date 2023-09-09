@@ -5,10 +5,13 @@ from typing_extensions import Annotated
 
 from param import Missing, Params
 
+
 class Upper:
     pass
 
+
 params: Params[Upper, str] = Params()
+
 
 @dataclass
 class Punctuate:

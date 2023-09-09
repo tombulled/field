@@ -30,7 +30,7 @@ RT = TypeVar("RT")
 
 class Params(Generic[M, R]):
     # TODO: Configure what to do if unsupported metadata found (e.g. ignore vs throw)
-    
+
     resolvers: MutableResolvers[M, R]
 
     def __init__(
