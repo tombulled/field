@@ -1,8 +1,10 @@
 import functools
+import inspect
 from typing import (
     Any,
     Callable,
     Generic,
+    Mapping,
     MutableMapping,
     Optional,
     Sequence,
@@ -10,11 +12,11 @@ from typing import (
     TypeVar,
 )
 
+from arguments import Arguments, BoundArguments
 from typing_extensions import ParamSpec
 
-from . import api, utils
+from . import utils
 from .errors import ResolutionError
-from .models import Parameter, Arguments, BoundArguments
 from .resolver import MutableResolvers, Resolver, Resolvers
 from .typing import AnyCallable
 
@@ -92,17 +94,19 @@ class Params(Generic[M, R]):
             if self.can_resolve(metadata)
         ]
 
-    def get_parameter_metadata(self, parameter: Parameter, /) -> Sequence[M]:
+    def get_parameter_metadata(self, parameter: inspect.Parameter, /) -> Sequence[M]:
         return self.get_metadata(parameter.annotation)
 
     def resolve(self, func: AnyCallable, arguments: Arguments) -> Arguments:
         bound_arguments: BoundArguments = arguments.bind(func)
 
+        parameters: Mapping[str, inspect.Parameter] = inspect.signature(func).parameters
+
         args: MutableMapping[str, Any] = {}
         kwargs: MutableMapping[str, Any] = {}
 
-        parameter: Parameter
-        for parameter in api.get_parameters(func).values():
+        parameter: inspect.Parameter
+        for parameter in parameters.values():
             argument: Any = bound_arguments.get(parameter.name)
             metadatas: Sequence[Any] = self.get_parameter_metadata(parameter)
 

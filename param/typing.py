@@ -1,15 +1,7 @@
-from typing import Any, Callable, Sequence, TypeVar, Union
+from typing import Any, Callable, Sequence, TypeVar
 
-from .sentinels import MissingType
-
-__all__: Sequence[str] = (
-    "AnyCallable",
-    "AnyOrMissing",
-)
+__all__: Sequence[str] = ("AnyCallable",)
 
 T = TypeVar("T")
 
-OrMissing = Union[T, MissingType]
-
 AnyCallable = Callable[..., Any]
-AnyOrMissing = OrMissing[Any]

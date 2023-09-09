@@ -6,7 +6,6 @@ from pydantic.fields import FieldInfo
 from typing_extensions import Annotated
 
 from ..resolver import Resolver
-from ..sentinels import Missing
 
 __all__: Sequence[str] = ("PydanticResolver",)
 

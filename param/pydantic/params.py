@@ -1,8 +1,8 @@
+from inspect import Parameter
 from typing import Any, Final, Optional, Sequence
 
 from pydantic.fields import FieldInfo
 
-from ..models import Parameter
 from ..params import Params
 from ..resolver import Resolvers
 from .resolver import PydanticResolver
