@@ -18,7 +18,6 @@ from typing_extensions import ParamSpec
 from . import utils
 from .errors import ResolutionError
 from .resolver import MutableResolvers, Resolver, Resolvers
-from .typing import AnyCallable
 
 __all__: Sequence[str] = ("Params",)
 
@@ -97,7 +96,7 @@ class Params(Generic[M, R]):
     def get_parameter_metadata(self, parameter: inspect.Parameter, /) -> Sequence[M]:
         return self.get_metadata(parameter.annotation)
 
-    def resolve(self, func: AnyCallable, arguments: Arguments) -> Arguments:
+    def resolve(self, func: Callable[..., Any], arguments: Arguments) -> Arguments:
         bound_arguments: BoundArguments = arguments.bind(func)
 
         parameters: Mapping[str, inspect.Parameter] = inspect.signature(func).parameters
