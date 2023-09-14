@@ -15,7 +15,7 @@ packages = [
 [tool.poetry.dependencies]
 python = "^3.8"
 roster = "^0.1.8"
-pydantic = "^1.10.2"
+pydantic = "^2.3.0"
 tombulled-arguments = "^0.1.5"
 
 [tool.poetry.group.dev.dependencies]
