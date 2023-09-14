@@ -29,8 +29,6 @@ RT = TypeVar("RT")
 
 
 class Params(Generic[M, R]):
-    # TODO: Configure what to do if unsupported metadata found (e.g. ignore vs throw)
-
     resolvers: MutableResolvers[M, R]
 
     def __init__(
@@ -69,8 +67,6 @@ class Params(Generic[M, R]):
     def get_resolver(self, metadata: M, /) -> Optional[Resolver[M, R]]:
         metadata_cls: Type[M] = type(metadata)
 
-        # NOTE: For now this is naive, however, in the future, may want
-        # to do a subclass check (e.g. Dog would match a resolver for Animal)
         return self.resolvers.get(metadata_cls)
 
     def can_resolve(self, metadata: M, /) -> bool:

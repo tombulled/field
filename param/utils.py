@@ -12,7 +12,7 @@ def get_metadata(typ: Any, /) -> Sequence[Any]:
 
 
 def is_annotated(typ: Any, /) -> bool:
-    return hasattr(typ, "__metadata__")
+    return bool(get_metadata(typ))
 
 
 def get_annotated_type(typ: Any, /) -> Any:

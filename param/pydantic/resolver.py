@@ -17,10 +17,11 @@ class PydanticResolver(Resolver[FieldInfo, Any]):
     config: Optional[ConfigDict] = None
 
     def __call__(self, field_info: FieldInfo, argument: Any, /) -> Any:
-        annotation: Any = field_info.annotation
-
-        if annotation is None:
-            annotation = Any
+        annotation: Any = (
+            field_info.annotation
+            if field_info.annotation is not None
+            else Any
+        )
 
         if field_info.default is PydanticUndefined:
             field_info = FieldInfo.from_annotation(annotation)

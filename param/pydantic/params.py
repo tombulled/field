@@ -10,6 +10,8 @@ from ..params import Params
 from ..resolver import Resolvers
 from .resolver import PydanticResolver
 
+__all__: Sequence[str] = ("PydanticParams",)
+
 PydanticResolvers = Resolvers[FieldInfo, Any]
 
 DEFAULT_RESOLVERS: Final[PydanticResolvers] = {
@@ -32,11 +34,17 @@ class PydanticParams(Params[FieldInfo, Any]):
     def enrich_field_info(parameter: Parameter, field_info: FieldInfo) -> FieldInfo:
         if field_info.alias is None:
             field_info.alias = parameter.name
-        if (
-            field_info.annotation is None
-            and parameter.annotation is not Parameter.empty
-        ):
-            field_info.annotation = utils.get_annotated_type(parameter.annotation)
+
+        if field_info.annotation is None:
+            annotation: Any
+
+            if parameter.annotation is Parameter.empty:
+                annotation = Any
+            else:
+                annotation = utils.get_annotated_type(parameter.annotation)
+
+            field_info.annotation = annotation
+
         if (
             field_info.default is PydanticUndefined
             and parameter.default is not Parameter.empty
