@@ -1,4 +1,3 @@
-import typing
 from typing import Any, Sequence
 
 __all__: Sequence[str] = ("get_metadata", "is_annotated", "get_annotated_type")
@@ -19,4 +18,4 @@ def get_annotated_type(typ: Any, /) -> Any:
     if not is_annotated(typ):
         return typ
 
-    return typing.get_origin(typ)
+    return typ.__origin__

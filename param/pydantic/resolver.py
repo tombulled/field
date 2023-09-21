@@ -5,8 +5,7 @@ from pydantic import ConfigDict, RootModel
 from pydantic.fields import FieldInfo
 from typing_extensions import Annotated
 
-from pydantic_core import PydanticUndefined
-
+from .. import utils
 from ..resolver import Resolver
 
 __all__: Sequence[str] = ("PydanticResolver",)
@@ -23,13 +22,8 @@ class PydanticResolver(Resolver[FieldInfo, Any]):
             else Any
         )
 
-        if field_info.default is PydanticUndefined:
-            field_info = FieldInfo.from_annotation(annotation)
-        else:
-            field_info = FieldInfo.from_annotated_attribute(
-                annotation, field_info.default
-            )
+        annotated_type: Any = utils.get_annotated_type(annotation)
 
-        root_model = RootModel[Annotated[annotation, field_info]]
+        root_model = RootModel[Annotated[annotated_type, field_info]]
 
         return root_model(argument).root
