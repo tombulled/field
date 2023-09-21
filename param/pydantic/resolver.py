@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from typing import Any, Optional, Sequence
 
-from pydantic import ConfigDict, RootModel
+from pydantic import ConfigDict, RootModel, create_model
 from pydantic.fields import FieldInfo
 from typing_extensions import Annotated
 
@@ -17,13 +17,18 @@ class PydanticResolver(Resolver[FieldInfo, Any]):
 
     def __call__(self, field_info: FieldInfo, argument: Any, /) -> Any:
         annotation: Any = (
-            field_info.annotation
-            if field_info.annotation is not None
-            else Any
+            field_info.annotation if field_info.annotation is not None else Any
         )
 
         annotated_type: Any = utils.get_annotated_type(annotation)
 
-        root_model = RootModel[Annotated[annotated_type, field_info]]
+        config: ConfigDict = (
+            self.config if self.config is not None else ConfigDict()
+        )
 
-        return root_model(argument).root
+        class Root(RootModel[annotated_type]):
+            model_config = config
+
+            root: annotated_type = field_info
+
+        return Root(root=argument).root
