@@ -9,5 +9,5 @@ def test_Resolver_isinstance() -> None:
 
     def my_resolver(metadata: Metadata, argument: Any) -> str:
         return "yo!"
-    
+
     assert isinstance(my_resolver, Resolver)

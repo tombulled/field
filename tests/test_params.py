@@ -1,13 +1,14 @@
-from dataclasses import dataclass
 import inspect
+from dataclasses import dataclass
 from typing import Any, Callable, Generic, TypeVar
+
+import pytest
+from arguments import Arguments
 from typing_extensions import Annotated
 
-from arguments import Arguments
-import pytest
 from param import Params
-from param.resolver import Resolvers
 from param.errors import ResolutionError
+from param.resolver import Resolvers
 
 T = TypeVar("T")
 

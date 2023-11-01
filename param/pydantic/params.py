@@ -32,19 +32,22 @@ class PydanticParams(Params[FieldInfo, Any]):
 
     @staticmethod
     def enrich_field_info(parameter: Parameter, field_info: FieldInfo) -> FieldInfo:
+        # "Alias" Inference: If the field has no alias, use the parameter name
         if field_info.alias is None:
             field_info.alias = parameter.name
+            field_info.alias_priority = 2
 
+        # "Annotation" Inference: If the field has no type annotation, infer
+        # one from the parameter's annotation
         if field_info.annotation is None:
-            annotation: Any
+            field_info.annotation = (
+                Any
+                if parameter.annotation is Parameter.empty
+                else utils.get_annotated_type(parameter.annotation)
+            )
 
-            if parameter.annotation is Parameter.empty:
-                annotation = Any
-            else:
-                annotation = utils.get_annotated_type(parameter.annotation)
-
-            field_info.annotation = annotation
-
+        # "Default" Inference: If the field has no default value, use the default
+        # value of the parameter
         if (
             field_info.default is PydanticUndefined
             and parameter.default is not Parameter.empty
@@ -60,7 +63,7 @@ class PydanticParams(Params[FieldInfo, Any]):
 
         if total_field_infos == 0:
             return field_infos
-        elif len(field_infos) > 1:
+        if len(field_infos) > 1:
             raise ResolutionError(
                 f"Expected <=1 metadatas of type {FieldInfo!r}, got {len(field_infos)}"
             )
