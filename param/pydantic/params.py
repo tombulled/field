@@ -40,11 +40,14 @@ class PydanticParams(Params[FieldInfo, Any]):
         # "Annotation" Inference: If the field has no type annotation, infer
         # one from the parameter's annotation
         if field_info.annotation is None:
-            field_info.annotation = (
-                Any
-                if parameter.annotation is Parameter.empty
-                else utils.get_annotated_type(parameter.annotation)
-            )
+            annotation: Any
+
+            if parameter.annotation is Parameter.empty:
+                annotation = Any
+            else:
+                annotation = utils.get_annotated_type(parameter.annotation)
+
+            field_info.annotation = annotation
 
         # "Default" Inference: If the field has no default value, use the default
         # value of the parameter
