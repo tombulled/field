@@ -5,8 +5,8 @@ import pytest
 from pydantic_core import PydanticUndefined
 from typing_extensions import Annotated
 
-from param.errors import ResolutionError
-from param.pydantic import ParamInfo, PydanticParams, PydanticResolver
+from meta.errors import ResolutionError
+from meta.pydantic import ParamInfo, PydanticParams, PydanticResolver
 
 
 def test_PydanticParams_init() -> None:

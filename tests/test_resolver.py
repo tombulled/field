@@ -1,6 +1,6 @@
 from typing import Any
 
-from param import Resolver
+from meta.v1 import Resolver
 
 
 def test_Resolver_isinstance() -> None:

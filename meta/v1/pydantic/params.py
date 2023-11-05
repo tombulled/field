@@ -6,7 +6,7 @@ from pydantic_core import PydanticUndefined
 
 from .. import utils
 from ..errors import ResolutionError
-from ..params import Params
+from ...params import Params
 from ..resolver import Resolvers
 from .resolver import PydanticResolver
 

@@ -3,7 +3,7 @@ from typing import Any
 
 from typing_extensions import Annotated
 
-from param.meta import MetadataManagerImpl
+from param.manager import MetadataManagerImpl
 
 
 @dataclass

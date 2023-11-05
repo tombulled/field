@@ -17,6 +17,7 @@ python = "^3.8"
 roster = "^0.1.8"
 pydantic = "^2.3.0"
 tombulled-arguments = "^0.1.5"
+annotated-types = "^0.6.0"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.5"
@@ -24,10 +25,6 @@ mypy = "^1.5.1"
 black = "^23.7.0"
 pytest = "^7.4.0"
 isort = "^5.12.0"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
 check_untyped_defs = true
@@ -39,3 +36,11 @@ warn_unused_ignores = true
 
 [tool.pytest.ini_options]
 testpaths = "tests/"
+
+[tool.isort]
+profile = "black"
+color_output = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

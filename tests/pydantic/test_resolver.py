@@ -3,7 +3,7 @@ from pydantic import ConfigDict, ValidationError
 from pydantic.fields import FieldInfo
 from typing_extensions import Annotated
 
-from param.pydantic import PydanticResolver
+from meta.pydantic import PydanticResolver
 
 
 def test_PydanticResolver_default_config() -> None:

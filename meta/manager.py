@@ -1,7 +1,7 @@
 from typing import Any, Callable, Optional, Sequence, Type, TypeVar
 
 from . import utils
-from .api import MetadataManager
+from .protocols import MetadataManager
 from .errors import ResolutionError
 from .resolver import Resolver, Resolvers
 
@@ -9,7 +9,7 @@ M = TypeVar("M")
 R = TypeVar("R")
 
 
-class MetadataManagerImpl(MetadataManager[M, R]):
+class Metas(MetadataManager[M, R]):
     def __init__(
         self,
         resolvers: Optional[Resolvers[M, R]] = None,

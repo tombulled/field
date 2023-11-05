@@ -3,7 +3,6 @@ from typing import Any, Callable, Optional, Protocol, Sequence, Type, TypeVar
 
 from typing_extensions import ParamSpec
 
-from . import utils
 from .resolver import MutableResolvers, Resolver
 
 M = TypeVar("M")
@@ -64,10 +63,13 @@ class MetadataManager(Protocol[M, R]):
         ...
 
 
-class ParameterMetadataManager(Protocol):
-    def __call__(self, func: Callable[PS, RT], /) -> Callable[PS, RT]:
+class ParameterMetadataManager(Protocol[M, R]):
+    metadata_manager: MetadataManager[M, R]
+
+    @abstractmethod
+    def wrap(self, func: Callable[PS, RT], /) -> Callable[PS, RT]:
         """
-        @params
+        @params.wrap
         def greet(name: Name) -> str:
             return f"Hello, {name}!"
 
@@ -76,6 +78,7 @@ class ParameterMetadataManager(Protocol):
         """
         ...
 
+    @abstractmethod
     def resolve(self, func, arguments):
         """
         def greet(name: Name) -> str:
@@ -86,12 +89,10 @@ class ParameterMetadataManager(Protocol):
         """
         ...
 
+    @abstractmethod
     def resolve_parameter(self, parameter, argument):
         """
         >>> params.resolve_parameter(name_parameter, "bob dylan")
         "Bob Dylan"
         """
         ...
-
-    # get_metadata
-    # get_parameter_metadata

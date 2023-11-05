@@ -1,6 +1,6 @@
 from typing_extensions import Annotated
 
-from param import utils
+from meta import utils
 
 
 def test_get_metadata() -> None:
