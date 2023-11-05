@@ -1,9 +1,9 @@
 from typing import Any, TypeVar
 
 from .errors import ResolutionError
-from .metadata import Gt, Lt
+from .metadata import Gt, Ge, Lt
 from .resolver import ResolversMap
-from .types import SupportsGt, SupportsLt
+from .protocols import SupportsGt, SupportsGe, SupportsLt
 from .typing import Metadata
 
 T = TypeVar("T")
@@ -20,6 +20,16 @@ def gt(meta: Gt, value: T) -> T:
 
     if not value > meta.gt:
         raise ResolutionError(f"Input should be greater than {meta.gt}")
+
+    return value
+
+@RESOLVERS(Ge)
+def ge(meta: Ge, value: T) -> T:
+    if not isinstance(value, SupportsGe):
+        raise TypeError(f"The 'ge' constraint cannot be applied to {type(value)}")
+
+    if not value >= meta.ge:
+        raise ResolutionError(f"Input should be greater than or equal to {meta.ge}")
 
     return value
 
@@ -46,4 +56,4 @@ def lt(meta: Lt, value: T) -> T:
 # Len
 # Timezone
 # Predicate
-# Doc
+# DocInfo (dont do?)
