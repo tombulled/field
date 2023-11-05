@@ -1,5 +1,8 @@
-from typing import Any, Callable, Sized, TypeVar
+import sys
+from datetime import datetime, timezone
+from typing import Any, Callable, Sized, TypeVar, Union
 
+import dateutil.tz
 from annotated_types import (
     Ge,
     Gt,
@@ -13,18 +16,23 @@ from annotated_types import (
 )
 
 from .protocols import (
-    SupportsGt,
-    SupportsGe,
-    SupportsLt,
-    SupportsLe,
-    SupportsMod,
     SupportsDiv,
+    SupportsGe,
+    SupportsGt,
+    SupportsLe,
+    SupportsLt,
+    SupportsMod,
 )
+
+if sys.version_info < (3, 10):
+    EllipsisType = type(Ellipsis)
+else:
+    from types import EllipsisType
 
 T = TypeVar("T")
 
 
-def resolve_gt(meta: Gt, value: T) -> T:
+def resolve_gt(meta: Gt, value: Any) -> SupportsGt:
     gt: SupportsGt = meta.gt
 
     if not isinstance(value, SupportsGt):
@@ -38,7 +46,7 @@ def resolve_gt(meta: Gt, value: T) -> T:
     return value
 
 
-def resolve_ge(meta: Ge, value: T) -> T:
+def resolve_ge(meta: Ge, value: Any) -> SupportsGe:
     ge: SupportsGe = meta.ge
 
     if not isinstance(value, SupportsGe):
@@ -52,7 +60,7 @@ def resolve_ge(meta: Ge, value: T) -> T:
     return value
 
 
-def resolve_lt(meta: Lt, value: T) -> T:
+def resolve_lt(meta: Lt, value: Any) -> SupportsLt:
     lt: SupportsLt = meta.lt
 
     if not isinstance(value, SupportsLt):
@@ -66,7 +74,7 @@ def resolve_lt(meta: Lt, value: T) -> T:
     return value
 
 
-def resolve_le(meta: Le, value: T) -> T:
+def resolve_le(meta: Le, value: Any) -> SupportsLe:
     le: SupportsLe = meta.le
 
     if not isinstance(value, SupportsLe):
@@ -101,7 +109,7 @@ def resolve_multiple_of(meta: MultipleOf, value: T) -> T:
         raise TypeError(f"Invalid `multiple_of` {type(value)}")
 
 
-def resolve_min_len(meta: MinLen, value: T) -> T:
+def resolve_min_len(meta: MinLen, value: Any) -> Sized:
     min_length: int = meta.min_length
 
     if not isinstance(value, Sized):
@@ -115,7 +123,7 @@ def resolve_min_len(meta: MinLen, value: T) -> T:
     return value
 
 
-def resolve_max_len(meta: MaxLen, value: T) -> T:
+def resolve_max_len(meta: MaxLen, value: Any) -> Sized:
     max_length: int = meta.max_length
 
     if not isinstance(value, Sized):
@@ -130,7 +138,31 @@ def resolve_max_len(meta: MaxLen, value: T) -> T:
 
 
 def resolve_timezone(meta: Timezone, value: T) -> T:
-    raise NotImplementedError
+    tz: Union[str, timezone, EllipsisType, None] = meta.tz
+
+    # TODO: Support usage of `time` as well
+    if not isinstance(value, datetime):
+        raise TypeError(
+            f"The {Timezone.__name__!r} constraint cannot be applied to {type(value)}"
+        )
+
+    if tz is None:
+        assert value.tzinfo is None
+
+        return value
+    elif tz is Ellipsis:
+        assert value.tzinfo is not None
+
+        return value
+    elif isinstance(tz, timezone):
+        raise NotImplementedError # TODO: Implement Me!
+    elif isinstance(tz, str):
+        print(dateutil.tz.gettz("Europe/Berlin"))
+        print(dateutil.tz.gettz(tz))
+
+        raise NotImplementedError # TODO: Implement Me!
+
+    raise NotImplementedError # TODO: Implement Me!
 
 
 def resolve_predicate(meta: Predicate, value: T) -> T:
