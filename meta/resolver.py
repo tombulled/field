@@ -32,6 +32,7 @@ class Resolver(Protocol[M_contra, R_co]):
 Resolvers: TypeAlias = Mapping[Type[M], Resolver[M, R]]
 MutableResolvers: TypeAlias = MutableMapping[Type[M], Resolver[M, R]]
 
+
 class ResolversMap(dict, MutableResolvers[M, R]):
     def __call__(
         self, metadata_cls: Type[M], /

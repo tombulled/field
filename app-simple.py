@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from typing import Any
+
 from typing_extensions import Annotated
+
 from meta import BaseMetadata, Metas
 
 
@@ -17,6 +19,7 @@ metas = Metas({Suffix: resolve_suffix})
 params = Params(metas)
 
 Name = Annotated[str, Suffix("!")]
+
 
 # @meta / @meta.bind / @meta.wrap
 @metas

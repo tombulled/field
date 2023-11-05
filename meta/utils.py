@@ -10,6 +10,7 @@ else:
 
 __all__: Sequence[str] = ("get_metadata",)
 
+
 def get_metadata(typ: Type[Any]) -> Iterator[Any]:
     origin: Optional[Any] = get_origin(typ)
 

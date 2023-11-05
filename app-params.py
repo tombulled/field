@@ -10,8 +10,10 @@ params = Params(metas)
 
 AdultAge = Annotated[int, Gt(18)]
 
+
 @params.wrap
 def buy_alcohol(age: AdultAge) -> None:
     print("Buying Alcohol!")
+
 
 buy_alcohol(12)

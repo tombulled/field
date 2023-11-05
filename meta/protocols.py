@@ -1,4 +1,5 @@
 from abc import abstractmethod
+from inspect import Parameter
 from typing import Any, Callable, Optional, Protocol, Sequence, Type, TypeVar
 
 from typing_extensions import ParamSpec
@@ -79,7 +80,7 @@ class ParameterMetadataManager(Protocol[M, R]):
         ...
 
     @abstractmethod
-    def resolve(self, func, arguments):
+    def resolve(self, func: Callable[..., RT], arguments) -> RT: # TODO: Type `arguments`
         """
         def greet(name: Name) -> str:
             return f"Hello, {name}!"
@@ -90,7 +91,7 @@ class ParameterMetadataManager(Protocol[M, R]):
         ...
 
     @abstractmethod
-    def resolve_parameter(self, parameter, argument):
+    def resolve_parameter(self, parameter: Parameter, argument: Any) -> R:
         """
         >>> params.resolve_parameter(name_parameter, "bob dylan")
         "Bob Dylan"

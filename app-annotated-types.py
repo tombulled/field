@@ -1,8 +1,9 @@
 import functools
+
 from meta import resolve
 from meta.metadata import Gt
-from meta.typing import Annotated
 from meta.resolvers import gt
+from meta.typing import Annotated
 from meta.utils import get_metadata
 
 Gt10 = Gt(10)

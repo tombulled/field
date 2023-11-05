@@ -1,15 +1,15 @@
 [tool.poetry]
-name = "tombulled-param"
-version = "0.1.17"
-description = "Enhanced function parameters"
+name = "tombulled-param" # TODO: Update this with new name
+version = "0.1.0"
+description = "Metadata!"
 authors = ["Tom Bulled <26026015+tombulled@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://pypi.org/project/param/"
-repository = "https://github.com/tombulled/param"
-keywords = ["python", "param"]
+homepage = "https://pypi.org/project/tombulled-param/" # TODO: Update this with new name
+repository = "https://github.com/tombulled/param" # TODO: Update this with new name
+keywords = ["python", "meta"]
 packages = [
-    {include = "param"}
+    {include = "meta"}
 ]
 
 [tool.poetry.dependencies]

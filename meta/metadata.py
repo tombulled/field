@@ -1,16 +1,16 @@
 from annotated_types import (
-    Gt,
-    Ge,
-    Lt,
-    Le,
-    Interval,
-    MultipleOf,
-    MinLen,
-    MaxLen,
-    Len,
-    Timezone,
-    Predicate,
     DocInfo,
+    Ge,
+    Gt,
+    Interval,
+    Le,
+    Len,
+    Lt,
+    MaxLen,
+    MinLen,
+    MultipleOf,
+    Predicate,
+    Timezone,
 )
 
 __all__ = (

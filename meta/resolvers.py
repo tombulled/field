@@ -1,11 +1,13 @@
 from typing import Any
-from .resolver import ResolversMap
+
 from .errors import ResolutionError
+from .metadata import Gt
+from .resolver import ResolversMap
 from .types import SupportsGt
 from .typing import Metadata
-from .metadata import Gt
 
 RESOLVERS: ResolversMap[Metadata, Any] = ResolversMap()
+
 
 # resolve / apply / validate / implement / check / handle / consume / parse
 @RESOLVERS(Gt)

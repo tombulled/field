@@ -1,12 +1,16 @@
 import sys
+from typing import Union
 
 if sys.version_info < (3, 9):
     from typing_extensions import Annotated
 else:
     from typing import Annotated
 
-from .base import BaseMetadata
+from .base import BaseMetadata, GroupedMetadata
 
-__all__ = ("Annotated", "Metadata",)
+__all__ = (
+    "Annotated",
+    "Metadata",
+)
 
-Metadata = BaseMetadata
+Metadata = Union[BaseMetadata, GroupedMetadata]

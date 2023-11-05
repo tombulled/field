@@ -6,9 +6,9 @@ import pytest
 from arguments import Arguments
 from typing_extensions import Annotated
 
-from meta.v1 import Params
 from meta.errors import ResolutionError
 from meta.resolver import Resolvers
+from meta.v1 import Params
 
 T = TypeVar("T")
 
