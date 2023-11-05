@@ -3,7 +3,7 @@ from typing import Any
 
 from typing_extensions import Annotated
 
-from meta import BaseMetadata, Metas
+from meta import BaseMetadata, Metas, Params
 
 
 @dataclass(frozen=True)
@@ -12,7 +12,7 @@ class Suffix(BaseMetadata):
 
 
 def resolve_suffix(meta: Suffix, value: Any) -> str:
-    return meta.suffix + str(value)
+    return str(value) + meta.suffix
 
 
 metas = Metas({Suffix: resolve_suffix})
@@ -21,7 +21,6 @@ params = Params(metas)
 Name = Annotated[str, Suffix("!")]
 
 
-# @meta / @meta.bind / @meta.wrap
-@metas
+@params.wrap
 def greet(name: Name) -> str:
     return f"Hello, {name}"

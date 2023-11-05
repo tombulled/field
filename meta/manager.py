@@ -1,8 +1,8 @@
 from typing import Any, Callable, Optional, Sequence, Type, TypeVar
 
 from . import utils
+from .api import MetadataManager
 from .errors import ResolutionError
-from .protocols import MetadataManager
 from .resolver import Resolver, Resolvers
 
 M = TypeVar("M")

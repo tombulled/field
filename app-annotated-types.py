@@ -14,3 +14,5 @@ gt(Gt10, 100)
 gt_10 = functools.partial(gt, Gt(10), "yo")
 
 m = get_metadata(BigInt)
+
+d = resolve(19, Gt10)

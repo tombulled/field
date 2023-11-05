@@ -6,7 +6,7 @@ from typing import Any, Callable, Mapping, MutableMapping, Sequence, TypeVar
 from arguments import Arguments, BoundArguments
 from typing_extensions import ParamSpec
 
-from .protocols import MetadataManager, ParameterMetadataManager
+from .api import MetadataManager, ParameterMetadataManager
 
 __all__: Sequence[str] = ("Params",)
 

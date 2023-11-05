@@ -3,11 +3,11 @@ from typing import Any
 
 from typing_extensions import Annotated
 
-from param.manager import MetadataManagerImpl
+from meta import BaseMetadata, Metas
 
 
 @dataclass
-class Suffix:
+class Suffix(BaseMetadata):
     suffix: str
 
 
@@ -17,7 +17,7 @@ def resolve_suffix(metadata: Suffix, value: Any) -> str:
     return value + metadata.suffix
 
 
-meta = MetadataManagerImpl({Suffix: resolve_suffix})
+meta = Metas({Suffix: resolve_suffix})
 
 assert meta.get_resolver(Suffix) is resolve_suffix
 assert meta.get_resolver(str) is None
