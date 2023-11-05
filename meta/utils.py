@@ -1,5 +1,5 @@
 import sys
-from typing import Any, Iterator, Optional, Sequence, Tuple, Type
+from typing import Any, Iterator, Optional, Sequence, Type
 
 import annotated_types
 

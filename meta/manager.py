@@ -56,12 +56,12 @@ class Metas(MetadataManager[M, R]):
                     f"No resolver available for metadata of type {type(metadata)!r}"
                 )
 
-            try:
-                resolved_value = resolver(metadata, resolved_value)
-            except Exception as error:
-                raise ResolutionError(
-                    f"Failed to resolve value {value!r} through resolver {resolver!r}"
-                ) from error
+            # try:
+            resolved_value = resolver(metadata, resolved_value)
+            # except Exception as error:
+            #     raise ResolutionError(
+            #         f"Failed to resolve value {value!r} through resolver {resolver!r}"
+            #     ) from error
 
         return resolved_value
 
