@@ -1,8 +1,6 @@
 import sys
 from datetime import datetime, timezone
 from typing import Any, Callable, Sized, TypeVar, Union
-
-import dateutil.tz
 from annotated_types import (
     Ge,
     Gt,
@@ -14,6 +12,8 @@ from annotated_types import (
     Predicate,
     Timezone,
 )
+
+from .operators import gt
 
 from .protocols import (
     SupportsDiv,
@@ -30,6 +30,70 @@ else:
     from types import EllipsisType
 
 T = TypeVar("T")
+
+
+def check_gt(constraint: Gt, value: Any) -> bool:
+    assert isinstance(value, SupportsGt)
+
+    # return value > constraint.gt
+    return gt(value, constraint.gt)
+
+
+def check_lt(constraint: Lt, value: Any) -> bool:
+    assert isinstance(value, SupportsLt)
+
+    return value < constraint.lt
+
+
+def check_ge(constraint: Ge, value: Any) -> bool:
+    assert isinstance(value, SupportsGe)
+
+    return value >= constraint.ge
+
+
+def check_le(constaint: Le, value: Any) -> bool:
+    assert isinstance(value, SupportsLe)
+
+    return value <= constaint.le
+
+
+def check_multiple_of(constraint: MultipleOf, value: Any) -> bool:
+    # assert isinstance(value, SupportsMod)
+
+    return value % constraint.multiple_of == 0
+
+
+def check_min_len(constraint: MinLen, value: Any) -> bool:
+    assert isinstance(value, Sized)
+
+    return len(value) >= constraint.min_length
+
+
+def check_max_len(constraint: MaxLen, value: Any) -> bool:
+    assert isinstance(value, Sized)
+
+    return len(value) <= constraint.max_length
+
+
+def check_predicate(constraint: Predicate, value: Any) -> bool:
+    return constraint.func(value)
+
+
+def check_timezone(constraint: Timezone, value: Any) -> bool:
+    assert isinstance(value, datetime)
+
+    has_tz: bool = value.tzinfo is not None
+
+    if constraint.tz is None:
+        return not has_tz
+    elif constraint.tz is Ellipsis:
+        return has_tz
+    elif isinstance(constraint.tz, str):
+        return has_tz and constraint.tz == value.tzname()
+    elif isinstance(constraint.tz, timezone):
+        return has_tz and value.tzinfo == constraint.tz
+
+    raise TypeError
 
 
 def resolve_gt(meta: Gt, value: Any) -> SupportsGt:
@@ -155,14 +219,11 @@ def resolve_timezone(meta: Timezone, value: T) -> T:
 
         return value
     elif isinstance(tz, timezone):
-        raise NotImplementedError # TODO: Implement Me!
+        raise NotImplementedError  # TODO: Implement Me!
     elif isinstance(tz, str):
-        print(dateutil.tz.gettz("Europe/Berlin"))
-        print(dateutil.tz.gettz(tz))
+        raise NotImplementedError  # TODO: Implement Me!
 
-        raise NotImplementedError # TODO: Implement Me!
-
-    raise NotImplementedError # TODO: Implement Me!
+    raise NotImplementedError  # TODO: Implement Me!
 
 
 def resolve_predicate(meta: Predicate, value: T) -> T:
