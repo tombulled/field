@@ -6,6 +6,7 @@ from .protocols import (
     SupportsLt,
     SupportsMod,
 )
+# from .metadata import MaxLen
 
 
 # NOTE: Should `b` be typed as `SupportsComparison` instead?
@@ -35,11 +36,14 @@ def min_len(a: Sized, b: int) -> bool:
     return len(a) >= b
 
 
-def max_len(constraint: MaxLen, value: Any) -> bool:
-    assert isinstance(value, Sized)
+def max_len(a: Sized, b: int) -> bool:
+    return len(a) <= b
 
-    return len(value) <= constraint.max_length
+# def max_len(constraint: MaxLen, value: Any) -> bool:
+#     assert isinstance(value, Sized)
+
+#     return len(value) <= constraint.max_length
 
 
-def predicate(predicate, value: Any) -> bool:
-    return predicate(value)
+# def predicate(predicate, value: Any) -> bool:
+#     return predicate(value)

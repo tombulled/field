@@ -3,7 +3,7 @@ from typing import Any
 
 from typing_extensions import Annotated
 
-from meta import BaseMetadata, Metas
+from meta import BaseMetadata, Meta
 
 
 @dataclass
@@ -17,7 +17,7 @@ def resolve_suffix(metadata: Suffix, value: Any) -> str:
     return value + metadata.suffix
 
 
-meta = Metas({Suffix: resolve_suffix})
+meta = Meta({Suffix: resolve_suffix})
 
 assert meta.get_resolver(Suffix) is resolve_suffix
 assert meta.get_resolver(str) is None
@@ -26,9 +26,9 @@ assert not meta.can_resolve(str)
 assert meta.resolve("hello") == "hello"
 assert meta.resolve("hello", Suffix("!!!")) == "hello!!!"
 assert meta.resolve("hello", Suffix("!"), Suffix("?")) == "hello!?"
-assert meta.extract(str) == []
-assert meta.extract(Annotated[str, Suffix("!")]) == [Suffix("!")]
-assert meta.extract(Annotated[str, Suffix("!"), Suffix("?")]) == [
+assert meta.parse(str) == []
+assert meta.parse(Annotated[str, Suffix("!")]) == [Suffix("!")]
+assert meta.parse(Annotated[str, Suffix("!"), Suffix("?")]) == [
     Suffix("!"),
     Suffix("?"),
 ]

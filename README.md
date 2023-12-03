@@ -1,22 +1,22 @@
-# param
-Enhanced function parameters
+# meta
+Parameter Metadata Management
 
 ## Installation
 ### PyPI
 ```console
-pip install tombulled-param
+pip install ...
 ```
 ### GitHub
 ```console
-pip install git+https://github.com/tombulled/param.git@main
+pip install ...
 ```
 
 ## Usage
-### 1. Create `Params` Instance
+### 1. Create a `Meta` Instance
 ```python
-from param import Params
+from meta import Meta
 
-params = Params()
+meta = Meta()
 ```
 
 ### 2. Create a Metadata Class

@@ -55,7 +55,7 @@ class Params(ParameterMetadataManager[M, R]):
         return Arguments(*args.values(), **kwargs)
 
     def resolve_parameter(self, parameter: inspect.Parameter, argument: Any) -> R:
-        metadatas: Sequence[M] = self.metadata_manager.extract(parameter.annotation)
+        metadatas: Sequence[M] = self.metadata_manager.parse(parameter.annotation)
 
         resolved_argument: Any = argument
 

@@ -13,7 +13,9 @@ from annotated_types import (
     Timezone,
 )
 
-from .operators import gt
+from . import operators
+
+# from .operators import gt
 
 from .protocols import (
     SupportsDiv,
@@ -32,11 +34,24 @@ else:
 T = TypeVar("T")
 
 
-def check_gt(constraint: Gt, value: Any) -> bool:
-    assert isinstance(value, SupportsGt)
+def _check_instance(obj: Any, typ: type, /) -> None:
+    # assert isinstance(obj, typ)
 
-    # return value > constraint.gt
-    return gt(value, constraint.gt)
+    if not isinstance(obj, typ):
+        raise TypeError(f"Expected value of type {typ}, got {type(obj)}")
+
+
+# def check_gt(constraint: Gt, value: Any) -> bool:
+#     _check_instance(value, SupportsGt)
+
+#     return value > constraint.gt
+
+
+def check_gt(constraint: Gt, value: Any) -> bool:
+    # assert isinstance(value, SupportsGt)
+    _check_instance(value, SupportsGt)
+
+    return operators.gt(value, constraint.gt)
 
 
 def check_lt(constraint: Lt, value: Any) -> bool:
@@ -97,17 +112,24 @@ def check_timezone(constraint: Timezone, value: Any) -> bool:
 
 
 def resolve_gt(meta: Gt, value: Any) -> SupportsGt:
-    gt: SupportsGt = meta.gt
-
-    if not isinstance(value, SupportsGt):
-        raise TypeError(
-            f"The {Gt.__name__!r} constraint cannot be applied to {type(value)}"
-        )
-
-    if not value > gt:
-        raise ValueError(f"Value {value} not greater than {gt}")
+    if not check_gt(meta, value):
+        raise ValueError(f"Value {value} not greater than {meta.gt}")
 
     return value
+
+
+# def resolve_gt(meta: Gt, value: Any) -> SupportsGt:
+#     gt: SupportsGt = meta.gt
+
+#     if not isinstance(value, SupportsGt):
+#         raise TypeError(
+#             f"The {Gt.__name__!r} constraint cannot be applied to {type(value)}"
+#         )
+
+#     if not value > gt:
+#         raise ValueError(f"Value {value} not greater than {gt}")
+
+#     return value
 
 
 def resolve_ge(meta: Ge, value: Any) -> SupportsGe:

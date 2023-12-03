@@ -9,7 +9,7 @@ M = TypeVar("M")
 R = TypeVar("R")
 
 
-class Metas(MetadataManager[M, R]):
+class Meta(MetadataManager[M, R]):
     def __init__(
         self,
         resolvers: Optional[Resolvers[M, R]] = None,
@@ -65,7 +65,7 @@ class Metas(MetadataManager[M, R]):
 
         return resolved_value
 
-    def extract(self, annotation: Any, /) -> Sequence[M]:
+    def parse(self, annotation: Any, /) -> Sequence[M]:
         return [
             metadata
             for metadata in utils.get_metadata(annotation)

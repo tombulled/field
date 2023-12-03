@@ -1,4 +1,6 @@
-from typing import Protocol, TypeVar, runtime_checkable
+from typing import Protocol, runtime_checkable
+
+import annotated_types as at
 
 __all__ = (
     "SupportsGt",
@@ -9,40 +11,32 @@ __all__ = (
     "SupportsDiv",
 )
 
-T = TypeVar("T")
+
+@runtime_checkable
+class SupportsGt(at.SupportsGt, Protocol):
+    ...
 
 
 @runtime_checkable
-class SupportsGt(Protocol):
-    def __gt__(self: T, __other: T) -> bool:
-        ...
+class SupportsGe(at.SupportsGe, Protocol):
+    ...
 
 
 @runtime_checkable
-class SupportsGe(Protocol):
-    def __ge__(self: T, __other: T) -> bool:
-        ...
+class SupportsLt(at.SupportsLt, Protocol):
+    ...
 
 
 @runtime_checkable
-class SupportsLt(Protocol):
-    def __lt__(self: T, __other: T) -> bool:
-        ...
+class SupportsLe(at.SupportsLe, Protocol):
+    ...
 
 
 @runtime_checkable
-class SupportsLe(Protocol):
-    def __le__(self: T, __other: T) -> bool:
-        ...
+class SupportsMod(at.SupportsMod, Protocol):
+    ...
 
 
 @runtime_checkable
-class SupportsMod(Protocol):
-    def __mod__(self: T, __other: T) -> T:
-        ...
-
-
-@runtime_checkable
-class SupportsDiv(Protocol):
-    def __div__(self: T, __other: T) -> T:
-        ...
+class SupportsDiv(at.SupportsDiv, Protocol):
+    ...

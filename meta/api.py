@@ -14,7 +14,15 @@ RT = TypeVar("RT")
 
 
 class MetadataManager(Protocol[M, R]):
-    resolvers: MutableResolvers[M, R]
+    # resolvers: MutableResolvers[M, R]
+
+    @abstractmethod
+    def resolve(self, value: Any, *metadatas: M) -> R:
+        """
+        >>> meta.resolve("hello", Punctuate("!!!"))
+        "hello!!!"
+        """
+        ...
 
     @abstractmethod
     def resolver(
@@ -32,29 +40,20 @@ class MetadataManager(Protocol[M, R]):
     @abstractmethod
     def get_resolver(self, metadata_cls: Type[M], /) -> Optional[Resolver[M, R]]:
         """
-        >>> meta.get_metadata(Dog)
+        >>> meta.get_resolver(Dog)
         <function resolve_animal at 0x7f057a88a4c0>
         """
         ...
 
-    @abstractmethod
     def can_resolve(self, metadata_cls: Type[M], /) -> bool:
         """
         >>> meta.can_resolve(Dog)
         True
         """
-        ...
+        return self.get_resolver(metadata_cls) is not None
 
     @abstractmethod
-    def resolve(self, value: Any, *metadatas: M) -> R:
-        """
-        >>> meta.resolve("hello", Punctuate("!!!"))
-        "hello!!!"
-        """
-        ...
-
-    @abstractmethod
-    def extract(self, annotation: Any, /) -> Sequence[M]:
+    def parse(self, annotation: Any, /) -> Sequence[M]:
         """
         meta = MetadataManager({Punctuate: resolve_punctuate})
 

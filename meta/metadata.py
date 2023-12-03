@@ -1,5 +1,5 @@
 from annotated_types import (
-    DocInfo,
+    DocInfo,  #  type: ignore [unknown-import]
     Ge,
     Gt,
     Interval,
