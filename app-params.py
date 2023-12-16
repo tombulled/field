@@ -1,9 +1,9 @@
 from typing_extensions import Annotated
 
 from meta import Meta
-from meta.metadata import Gt
+from meta.at.metadata import Gt
+from meta.at.resolvers import gt
 from meta.params import Params
-from meta.resolvers import gt
 
 metas = Meta({Gt: gt})
 params = Params(metas)

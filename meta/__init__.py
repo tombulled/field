@@ -1,9 +1,16 @@
-from .base import BaseMetadata, GroupedMetadata
+from .api import MetadataManager
+from .at import AnnotatedTypes
+
+# from .at.base import BaseMetadata, GroupedMetadata
 from .errors import ResolutionError
 from .manager import Meta
-from .metadata import *
+
+# from .at.metadata import *
 from .params import Params
-from .resolvers import *
+from .resolver import Resolver
+
+# from .at.resolvers import *
+# from .typing import Metadata
 
 METAS = Meta(
     {

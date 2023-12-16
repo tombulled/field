@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from typing import Any
+
 from typing_extensions import Annotated
 
 from meta import Meta

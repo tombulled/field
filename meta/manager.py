@@ -1,7 +1,7 @@
 from typing import Any, Callable, Optional, Sequence, Type, TypeVar
 
-from . import utils
 from .api import MetadataManager
+from .at import utils
 from .errors import ResolutionError
 from .resolver import Resolver, Resolvers
 
@@ -41,9 +41,16 @@ class Meta(MetadataManager[M, R]):
 
         return None
 
-    def can_resolve(self, metadata_cls: Type[M], /) -> bool:
-        return self.get_resolver(metadata_cls) is not None
-
+    # Current problem: this implementation makes perfect sense
+    # for parsing metadata (e.g. Prefix("foo"), Suffix("bar")).
+    # However, it makes no sense for validation metadata,
+    # (e.g. Gt(10), Len(5))).
+    # The MetadataManager class feels like it should perhaps be made
+    # bespokely for the metadata it manages, or a few size-fits-all
+    # classes could be provided.
+    # "resolution strategy"?
+    # I think this method should go back to supporting
+    # resolving just one piece of metadata? (or also implement a resolve_all?)
     def resolve(self, value: Any, *metadatas: M) -> R:
         resolved_value: R = value
 
