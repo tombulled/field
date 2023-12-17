@@ -1,6 +1,5 @@
-import sys
 from datetime import datetime, timezone
-from typing import Any, Sized, TypeVar
+from typing import Any, Sized
 
 from annotated_types import (
     Ge,
@@ -14,9 +13,7 @@ from annotated_types import (
     Timezone,
 )
 
-from . import operators
 from .protocols import (
-    SupportsDiv,
     SupportsGe,
     SupportsGt,
     SupportsLe,
@@ -36,8 +33,6 @@ __all__ = (
     "resolve_predicate",
 )
 
-T = TypeVar("T")
-
 
 def _assert_isinstance(obj: Any, *types: type) -> None:
     if not isinstance(obj, types):
@@ -47,31 +42,31 @@ def _assert_isinstance(obj: Any, *types: type) -> None:
 def resolve_gt(constraint: Gt, value: Any) -> bool:
     _assert_isinstance(value, SupportsGt)
 
-    return operators.gt(value, constraint.gt)
+    return value > constraint.gt
 
 
 def resolve_lt(constraint: Lt, value: Any) -> bool:
     _assert_isinstance(value, SupportsLt)
 
-    return operators.lt(value, constraint.lt)
+    return value < constraint.lt
 
 
 def resolve_ge(constraint: Ge, value: Any) -> bool:
     _assert_isinstance(value, SupportsGe)
 
-    return operators.ge(value, constraint.ge)
+    return value >= constraint.ge
 
 
 def resolve_le(constraint: Le, value: Any) -> bool:
     _assert_isinstance(value, SupportsLe)
 
-    return operators.le(value, constraint.le)
+    return value <= constraint.le
+
 
 def resolve_multiple_of(constraint: MultipleOf, value: Any) -> bool:
-    # _check_instance(value, SupportsMod)
-    # _assert_isinstance(value, SupportsMod)
+    _assert_isinstance(value, SupportsMod)
 
-    return operators.multiple_of(value, constraint.multiple_of)
+    return value % constraint.multiple_of == 0
 
 
 def resolve_min_len(constraint: MinLen, value: Any) -> bool:
