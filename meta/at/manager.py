@@ -13,15 +13,15 @@ T = TypeVar("T")
 
 
 RESOLVERS: Resolvers[Any, bool] = {
-    metadata.Gt: resolvers.resolve_gt,
-    metadata.Ge: resolvers.resolve_ge,
-    metadata.Lt: resolvers.resolve_lt,
-    metadata.Le: resolvers.resolve_le,
-    metadata.MultipleOf: resolvers.resolve_multiple_of,
-    metadata.MinLen: resolvers.resolve_min_len,
-    metadata.MaxLen: resolvers.resolve_max_len,
-    metadata.Timezone: resolvers.resolve_timezone,
-    metadata.Predicate: resolvers.resolve_predicate,
+    metadata.Gt: resolvers.check_gt,
+    metadata.Ge: resolvers.check_ge,
+    metadata.Lt: resolvers.check_lt,
+    metadata.Le: resolvers.check_le,
+    metadata.MultipleOf: resolvers.check_multiple_of,
+    metadata.MinLen: resolvers.check_min_len,
+    metadata.MaxLen: resolvers.check_max_len,
+    metadata.Timezone: resolvers.check_timezone,
+    metadata.Predicate: resolvers.check_predicate,
 }
 
 

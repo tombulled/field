@@ -22,15 +22,15 @@ from .protocols import (
 )
 
 __all__ = (
-    "resolve_gt",
-    "resolve_ge",
-    "resolve_lt",
-    "resolve_le",
-    "resolve_multiple_of",
-    "resolve_min_len",
-    "resolve_max_len",
-    "resolve_timezone",
-    "resolve_predicate",
+    "check_gt",
+    "check_ge",
+    "check_lt",
+    "check_le",
+    "check_multiple_of",
+    "check_min_len",
+    "check_max_len",
+    "check_timezone",
+    "check_predicate",
 )
 
 
@@ -39,53 +39,53 @@ def _assert_isinstance(obj: Any, *types: type) -> None:
         raise TypeError(f"Expected value of type {types}, got {type(obj)}")
 
 
-def resolve_gt(constraint: Gt, value: Any) -> bool:
+def check_gt(constraint: Gt, value: Any) -> bool:
     _assert_isinstance(value, SupportsGt)
 
     return value > constraint.gt
 
 
-def resolve_lt(constraint: Lt, value: Any) -> bool:
+def check_lt(constraint: Lt, value: Any) -> bool:
     _assert_isinstance(value, SupportsLt)
 
     return value < constraint.lt
 
 
-def resolve_ge(constraint: Ge, value: Any) -> bool:
+def check_ge(constraint: Ge, value: Any) -> bool:
     _assert_isinstance(value, SupportsGe)
 
     return value >= constraint.ge
 
 
-def resolve_le(constraint: Le, value: Any) -> bool:
+def check_le(constraint: Le, value: Any) -> bool:
     _assert_isinstance(value, SupportsLe)
 
     return value <= constraint.le
 
 
-def resolve_multiple_of(constraint: MultipleOf, value: Any) -> bool:
+def check_multiple_of(constraint: MultipleOf, value: Any) -> bool:
     _assert_isinstance(value, SupportsMod)
 
     return value % constraint.multiple_of == 0
 
 
-def resolve_min_len(constraint: MinLen, value: Any) -> bool:
+def check_min_len(constraint: MinLen, value: Any) -> bool:
     _assert_isinstance(value, Sized)
 
     return len(value) >= constraint.min_length
 
 
-def resolve_max_len(constraint: MaxLen, value: Any) -> bool:
+def check_max_len(constraint: MaxLen, value: Any) -> bool:
     _assert_isinstance(value, Sized)
 
     return len(value) <= constraint.max_length
 
 
-def resolve_predicate(constraint: Predicate, value: Any) -> bool:
+def check_predicate(constraint: Predicate, value: Any) -> bool:
     return constraint.func(value)
 
 
-def resolve_timezone(constraint: Timezone, value: Any) -> bool:
+def check_timezone(constraint: Timezone, value: Any) -> bool:
     _assert_isinstance(value, datetime)
 
     has_tz: bool = value.tzinfo is not None
