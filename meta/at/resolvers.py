@@ -67,7 +67,6 @@ def resolve_le(constraint: Le, value: Any) -> bool:
 
     return operators.le(value, constraint.le)
 
-
 def resolve_multiple_of(constraint: MultipleOf, value: Any) -> bool:
     # _check_instance(value, SupportsMod)
     # _assert_isinstance(value, SupportsMod)

@@ -1,7 +1,7 @@
 from typing import Any
 
 import annotated_types
-from annotated_types import DocInfo  # type: ignore [unknown-import]
+from annotated_types import DocInfo
 from annotated_types import Interval, Len, Predicate, Timezone
 
 __all__ = (

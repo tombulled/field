@@ -1,13 +1,21 @@
-from typing import Sized
+from typing import Any, Sized
 
-from .protocols import SupportsGe, SupportsGt, SupportsLe, SupportsLt, SupportsMod
+from .protocols import (
+    SupportsDiv,
+    SupportsGe,
+    SupportsGt,
+    SupportsLe,
+    SupportsLt,
+    SupportsMod,
+)
 
 __all__ = (
     "gt",
     "lt",
     "ge",
     "le",
-    "multiple_of",
+    "multiple_of_mod",
+    "multiple_of_div",
     "min_len",
     "max_len",
 )
@@ -37,10 +45,15 @@ def le(a: SupportsLe, b: SupportsLe) -> bool:
     return a <= b
 
 
-def multiple_of(a: SupportsMod, b: int) -> bool:
+def multiple_of_mod(a: SupportsMod, b: Any) -> bool:
     """True if `a` is a multiple of `b`"""
 
-    return bool(a % b == 0)
+    return a % b == 0
+
+def multiple_of_div(a: SupportsDiv, b: Any) -> bool:
+    """True if `a` is a multiple of `b`"""
+
+    return int(a / b) == a / b
 
 
 def min_len(a: Sized, b: int) -> bool:
