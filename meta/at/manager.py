@@ -41,7 +41,7 @@ class AnnotatedTypes(MetadataManager[BaseMetadata, Any]):
         resolution: Optional[bool] = None
 
         try:
-            resolution = super().resolve(meta, value)
+            resolution = self.check(meta, value)
         except Exception as error:
             self.on_error(meta, value, error)
 
