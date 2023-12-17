@@ -1,11 +1,8 @@
+from typing import Any
+
 import annotated_types
 from annotated_types import DocInfo  # type: ignore [unknown-import]
-from annotated_types import (  # Ge,; Gt,; Le,; Lt,; MaxLen,; MinLen,; MultipleOf,
-    Interval,
-    Len,
-    Predicate,
-    Timezone,
-)
+from annotated_types import Interval, Len, Predicate, Timezone
 
 __all__ = (
     "Gt",
@@ -22,40 +19,37 @@ __all__ = (
     "DocInfo",
 )
 
-# def _build_repr(..., ...):
-#     ...
 
-
-class Ge(annotated_types.Ge):
+class AnnotatedTypesReprMixin:
     def __repr__(self) -> str:
-        return f"{type(self).__name__}({self.ge})"
+        value: Any = next(iter(self.__dict__.values()))
+
+        return f"{type(self).__name__}({value})"
 
 
-class Gt(annotated_types.Gt):
-    def __repr__(self) -> str:
-        return f"{type(self).__name__}({self.gt})"
+class Ge(AnnotatedTypesReprMixin, annotated_types.Ge):
+    pass
 
 
-class Le(annotated_types.Le):
-    def __repr__(self) -> str:
-        return f"{type(self).__name__}({self.le})"
+class Gt(AnnotatedTypesReprMixin, annotated_types.Gt):
+    pass
 
 
-class Lt(annotated_types.Lt):
-    def __repr__(self) -> str:
-        return f"{type(self).__name__}({self.lt})"
+class Le(AnnotatedTypesReprMixin, annotated_types.Le):
+    pass
 
 
-class MaxLen(annotated_types.MaxLen):
-    def __repr__(self) -> str:
-        return f"{type(self).__name__}({self.max_length})"
+class Lt(AnnotatedTypesReprMixin, annotated_types.Lt):
+    pass
 
 
-class MinLen(annotated_types.MinLen):
-    def __repr__(self) -> str:
-        return f"{type(self).__name__}({self.min_length})"
+class MaxLen(AnnotatedTypesReprMixin, annotated_types.MaxLen):
+    pass
 
 
-class MultipleOf(annotated_types.MultipleOf):
-    def __repr__(self) -> str:
-        return f"{type(self).__name__}({self.multiple_of})"
+class MinLen(AnnotatedTypesReprMixin, annotated_types.MinLen):
+    pass
+
+
+class MultipleOf(AnnotatedTypesReprMixin, annotated_types.MultipleOf):
+    pass
