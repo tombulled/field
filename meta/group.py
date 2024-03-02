@@ -10,6 +10,9 @@ R = TypeVar("R")
 
 
 class BaseResolverGroup(Mapping[K, Resolver[M, R]], Resolver[M, R]):
+    # def __repr__(self) -> str:
+    #     return f"{type(self).__name__}({super().__repr__()})"
+    
     def __call__(self, metadata: M, value: Any) -> R:
         return self.resolve(metadata, value)
 
