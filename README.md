@@ -1,64 +1,54 @@
-# param
-Enhanced function parameters
+# meta
+Parameter Metadata Management
 
 ## Installation
 ### PyPI
 ```console
-pip install tombulled-param
+pip install ...
 ```
 ### GitHub
 ```console
-pip install git+https://github.com/tombulled/param.git@main
+pip install ...
 ```
 
 ## Usage
-### Functions
-The `@params` annotation works seamlessly with functions:
+### 1. Create a `Meta` Instance
 ```python
-from param import Param, params
+from meta import Meta
 
+meta = Meta()
+```
+
+### 2. Create a Metadata Class
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Punctuate:
+    punctation: str
+```
+
+### 3. Create a Resolver for the Metadata
+```python
+from typing import Any
+
+@params.resolver(Punctuate)
+def resolve_punctuate(metadata: Punctuate, argument: Any) -> str:
+    if not isinstance(argument, str):
+        raise TypeError(f"Cannot punctuate argument of type {type(argument)!r}")
+
+    return argument + metadata.punctation
+```
+
+### 4. Create a Callable
+```python
 @params
-def get(url: str, params: dict = Param(default_factory=dict)):
-    print("GET", url, params)
-```
-```python
->>> get("https://httpbin.com/get")
-GET https://httpbin.com/get {}
+def greet(name: Annotated[str, Punctuate("!")], /) -> str:
+    return f"Hello, {name}"
 ```
 
-### Classes
-The `@params` annotation also works seamlessly with classes. Importantly, the `@params` annotation should be specified before `@staticmethod` or `@classmethod`.
+#### 5. Invoke the Callable
 ```python
-from param import Param, params
-
-class MyClass:
-    @params
-    def get(self, url: str, params: dict = Param(default_factory=dict)):
-        print("GET", url, params)
-
-    @classmethod
-    @params
-    def post(cls, url: str, params: dict = Param(default_factory=dict)):
-        print("POST", url, params)
-
-    @staticmethod
-    @params
-    def put(url: str, params: dict = Param(default_factory=dict)):
-        print("PUT", url, params)
-```
-```python
->>> obj = MyClass()
->>>
->>> obj.get("https://httpbin.com/get")
-GET https://httpbin.com/get {}
->>>
->>> obj.post("https://httpbin.com/post")
-POST https://httpbin.com/post {}
->>> MyClass.post("https://httpbin.com/post")
-POST https://httpbin.com/post {}
->>>
->>> obj.put("https://httpbin.com/put")
-PUT https://httpbin.com/put {}
->>> MyClass.put("https://httpbin.com/put")
-PUT https://httpbin.com/put {}
+>>> greet("Bob")
+"Hello, Bob!"
 ```

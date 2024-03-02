@@ -1,22 +1,24 @@
 [tool.poetry]
-name = "tombulled-param"
-version = "0.1.17"
-description = "Enhanced function parameters"
+name = "tombulled-param" # TODO: Update this with new name
+version = "0.1.0"
+description = "Metadata!"
 authors = ["Tom Bulled <26026015+tombulled@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://pypi.org/project/param/"
-repository = "https://github.com/tombulled/param"
-keywords = ["python", "param"]
+homepage = "https://pypi.org/project/tombulled-param/" # TODO: Update this with new name
+repository = "https://github.com/tombulled/param" # TODO: Update this with new name
+keywords = ["python", "meta"]
 packages = [
-    {include = "param"}
+    {include = "meta"}
 ]
 
 [tool.poetry.dependencies]
 python = "^3.8"
 roster = "^0.1.8"
-pydantic = "^1.10.2"
+pydantic = "^2.3.0"
 tombulled-arguments = "^0.1.5"
+annotated-types = "^0.6.0"
+python-dateutil = "^2.8.2"
 
 [tool.poetry.group.dev.dependencies]
 pylint = "^2.17.5"
@@ -24,10 +26,6 @@ mypy = "^1.5.1"
 black = "^23.7.0"
 pytest = "^7.4.0"
 isort = "^5.12.0"
-
-[build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
 
 [tool.mypy]
 check_untyped_defs = true
@@ -39,3 +37,11 @@ warn_unused_ignores = true
 
 [tool.pytest.ini_options]
 testpaths = "tests/"
+
+[tool.isort]
+profile = "black"
+color_output = true
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
