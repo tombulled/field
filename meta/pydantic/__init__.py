@@ -1,1 +1,1 @@
-from .resolver import PydanticFieldInfoResolver
+from .resolver import PydanticResolver

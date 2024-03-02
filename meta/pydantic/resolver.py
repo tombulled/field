@@ -12,10 +12,10 @@ if sys.version_info < (3, 9):
 else:
     from typing import Annotated, get_args, get_origin
 
-__all__ = ("PydanticFieldInfoResolver",)
+__all__ = ("PydanticResolver",)
 
 
-def get_annotated_type(typ, /): # TODO: type me
+def get_annotated_type(typ, /):  # TODO: type me
     origin: Optional[Any] = get_origin(typ)
 
     if origin is not Annotated:
@@ -25,7 +25,7 @@ def get_annotated_type(typ, /): # TODO: type me
 
 
 @dataclass
-class PydanticFieldInfoResolver(Resolver[FieldInfo, Any]):
+class PydanticResolver(Resolver[FieldInfo, Any]):
     config: Optional[ConfigDict] = None
 
     def __call__(self, field_info: FieldInfo, value: Any, /) -> Any:

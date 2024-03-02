@@ -1,10 +1,11 @@
 from typing import Any, TypeVar
 
 from annotated_types import BaseMetadata
+
 from meta.api import Resolver
+from meta.at import metadata, resolvers
 from meta.at.errors import ValidationError
 from meta.group import ResolverGroup
-from meta.at import metadata, resolvers
 
 T = TypeVar("T")
 

@@ -10,9 +10,9 @@ R = TypeVar("R")
 
 
 class BaseResolverGroup(Mapping[K, Resolver[M, R]], Resolver[M, R]):
-    # def __repr__(self) -> str:
-    #     return f"{type(self).__name__}({super().__repr__()})"
-    
+    def __repr__(self) -> str:
+        return f"{type(self).__name__}({super().__repr__()})"
+
     def __call__(self, metadata: M, value: Any) -> R:
         return self.resolve(metadata, value)
 
@@ -42,7 +42,7 @@ class LiteralResolverGroupABC(BaseResolverGroup[M, M, R]):
         return self.get(metadata)
 
 
-class LiteralResolverGroup(Dict[M, Resolver[M, R]], LiteralResolverGroupABC[M, R]):
+class LiteralResolverGroup(LiteralResolverGroupABC[M, R], Dict[M, Resolver[M, R]]):
     pass
 
 
@@ -56,5 +56,5 @@ class ResolverGroupABC(BaseResolverGroup[Type[M], M, R]):
         return None
 
 
-class ResolverGroup(Dict[Type[M], Resolver[M, R]], ResolverGroupABC[M, R]):
+class ResolverGroup(ResolverGroupABC[M, R], Dict[Type[M], Resolver[M, R]]):
     pass
