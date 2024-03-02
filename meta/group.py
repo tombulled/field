@@ -13,10 +13,10 @@ class BaseResolverGroup(Mapping[K, Resolver[M, R]], Resolver[M, R]):
     def __repr__(self) -> str:
         return f"{type(self).__name__}({super().__repr__()})"
 
-    def __call__(self, metadata: M, value: Any) -> R:
+    def __call__(self, metadata: M, value: Any, /) -> R:
         return self.resolve(metadata, value)
 
-    def resolve(self, metadata: M, value: Any) -> R:
+    def resolve(self, metadata: M, value: Any, /) -> R:
         resolver: Optional[Resolver[M, R]] = self.get_resolver(metadata)
 
         if resolver is None:

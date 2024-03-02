@@ -1,5 +1,4 @@
-import sys
-from typing import Any
+from typing import Any, Mapping, Tuple
 
 import annotated_types
 from annotated_types import DocInfo, Interval, Len, Predicate, Timezone
@@ -22,12 +21,17 @@ __all__ = (
 
 class AnnotatedTypesReprMixin:
     def __repr__(self) -> str:
+        attrs: Mapping[str, Any] = getattr(self, "__dict__", {})
+        slots: Tuple[str, ...] = getattr(self, "__slots__", ())
+
         value: Any
 
-        if sys.version_info < (3, 10):
-            value = next(iter(self.__dict__.values()))
+        if attrs:
+            value = next(iter(attrs.values()))
+        elif slots:
+            value = getattr(self, slots[0])
         else:
-            value = getattr(self, self.__slots__[0])
+            value = ""
 
         return f"{type(self).__name__}({value})"
 

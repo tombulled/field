@@ -15,13 +15,13 @@ else:
 __all__ = ("PydanticResolver",)
 
 
-def get_annotated_type(typ, /):  # TODO: type me
-    origin: Optional[Any] = get_origin(typ)
+def get_annotated_type(tp: Any, /) -> Any:
+    origin: Optional[Any] = get_origin(tp)
 
     if origin is not Annotated:
-        return typ
+        return tp
 
-    return get_args(typ)[0]
+    return get_args(tp)[0]
 
 
 @dataclass
