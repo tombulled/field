@@ -19,7 +19,12 @@ class BaseResolverGroup(Mapping[K, Resolver[M, R]], Resolver[M, R]):
         if resolver is None:
             raise ResolutionError(f"No resolver available for metadata {metadata!r}")
 
-        return resolver(metadata, value)
+        try:
+            return resolver(metadata, value)
+        except Exception as error:
+            raise ResolutionError(
+                f"Failed to resolve value {value!r} through resolver {resolver!r}"
+            ) from error
 
     @abstractmethod
     def get_resolver(self, metadata: M, /) -> Optional[Resolver[M, R]]:
