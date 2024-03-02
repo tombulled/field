@@ -36,6 +36,3 @@ class AnnotatedTypes(Resolver[BaseMetadata, Any]):
             raise ValidationError(f"Value {value!r} failed constraint {metadata!r}")
 
         return value
-
-
-AT = AnnotatedTypes()
